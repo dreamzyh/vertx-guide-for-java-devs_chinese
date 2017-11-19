@@ -1,12 +1,12 @@
-= Introduction
+= 介绍
 
-This guide is a gentle introduction to asynchronous programming with Vert.x, primarily aimed at developers familiar with mainstream non-asynchronous web development frameworks and libraries (e.g., Java EE, Spring).
+本指南简要介绍了使用Vert.x进行异步编程，主要针对熟悉主流非异步Web开发框架和库（例如Java EE，Spring）的开发人员。
 
-== About this guide
+== 关于本指南
 
-We assume that the reader is familiar with the Java programming language and its ecosystem.
+我们假设读者熟悉Java编程语言及其生态系统。
 
-We will start from a wiki web application backed by a relational database and server-side rendering of pages; then we will evolve the application through several steps until it becomes a modern single-page application with "real-time".footnote:[Note that the widespread usage of the term "real-time" in the context of web technologies shall not be confused with _hard_ or _soft_ real-time in specialized operating systems.] web features.
+我们将从一个由关系数据库和服务器端页面渲染支持的wiki Web应用程序开始;那么我们将通过几个步骤来改进应用程序，直到它成为一个具有“实时性”的现代单页面应用程序。网页功能。一路上你会学到：We will start from a wiki web application backed by a relational database and server-side rendering of pages; then we will evolve the application through several steps until it becomes a modern single-page application with "real-time".footnote:[Note that the widespread usage of the term "real-time" in the context of web technologies shall not be confused with _hard_ or _soft_ real-time in specialized operating systems.] web features.
 Along the way you will learn to:
 
 1. Design a web application with server-side rendering of pages through templates, and using a relational database for persisting data.
