@@ -42,7 +42,7 @@ Vert.x不强加任何打包或构建环境。由于Vert.x核心本身只是一�
 
 在Vert.x中有两个关键概念要学习：
 
-1. _verticle_是什么。what a _verticle_ is, and
+1. _verticle_是什么。
 2. _事件总线(event bus)_如何允许verticle通信。
 
 === 线程和编程模型
@@ -53,16 +53,11 @@ Vert.x中的部署单位称为_Verticle_。 Verticle通过_事件循环_处理�
 
 image::images/event-loop.png[]
 
-Each event shall be processed in a _reasonable_ amount of time to not block the event loop.
-This means that _thread blocking_ operations shall not be performed while executed on the event loop, exactly like processing events in a graphical user interface (e.g., freezing a Java / Swing interface by doing a slow network request).
-As we will see later in this guide, Vert.x offers mechanisms to deal with blocking operations outside of the event loop.
-In any case Vert.x emits warnings in logs when the event loop has been processing an event for _too long_, which is also configurable to match application-specific requirements (e.g., when working on slower IoT ARM boards).
+每个事件应在合理的时间内处理，以便不阻塞事件循环。这意味着_线程阻塞_操作不应该在事件循环中执行，就像处理图形用户界面中的事件一样（例如，通过缓慢的网络请求来冻结Java/Swing接口）。正如我们将在本指南后面看到的，Vert.x提供了处理事件循环之外的阻塞操作的机制。在任何情况下，当事件循环处理事件的时间太长时，Vert.x会在日志中发出警告，这也可以根据应用程序的具体要求进行配置（例如，在较慢的IoT ARM板上工作时）。
 
-Every event loop is attached to a thread.
-By default Vert.x attaches 2 event loops per CPU core thread.
-The direct consequence is that a regular verticle always processes events on the same thread, so there is no need to use thread coordination mechanisms to manipulate a verticle state (e.g, Java class fields).
+每个事件循环都附加到一个线程。默认情况下，Vert.x会在每个CPU核心线程上添加2个事件循环。直接的结果是，一个常规的verticle总是在同一个线程上处理事件，所以不需要使用线程协调机制来操纵一个verticle状态（例如，Java类字段）。
 
-A verticle can be passed some configuration (e.g., credentials, network addresses, etc) and a verticle can be deployed several times:
+Verticle可以通过一些配置（例如，凭证，网络地址等），并且可以被部署多次：
 
 image::images/verticle-threading-config.png[]
 
