@@ -24,17 +24,13 @@
 == 什么是Vert.x?
 
 [quote, Vert.x 网站]
-Vert.x是在JVM上构建响应式应用程序的工具包。
+Eclipse Vert.x是在JVM上构建响应式应用程序的工具包。
 
-Eclipse Vert.x (which we will just call _Vert.x_ in the remainder of this document) is an opensource project at the Eclipse Foundation.
-Vert.x was initiated in 2012 by Tim Fox.
+Eclipse Vert.x (我们将在本文档的其余部分中称为Vert.x)是Eclipse Foundation的一个开源项目。Vert.x于2012年由Tim Fox发起。
 
-Vert.x is not a framework but a toolkit: the core library defines the fundamental APIs for writing asynchronous networked applications, and then you can pick the useful modules for your application (e.g., database connection, monitoring, authentication, logging, service discovery, clustering support, etc).
-Vert.x is based on the http://netty.io/[Netty project], a high-performance asynchronous networking library for the JVM.
-Vert.x will let you access the Netty internals _if need be_, but in general you will better benefit from the higher-level APIs that Vert.x provides while not sacrificing performance compared to _raw_ Netty.
+Vert.x不是一个框架，而是一个工具包：核心库定义了用于编写异步网络应用程序的基本API，您可以为您的应用程序选择有用的模块（例如数据库连接，监控，认证，日志记录，服务发现，集群支持等）。 Vert.x基于http://netty.io/[Netty项目]，这是JVM的高性能异步网络库。_如果需要_，Vert.x将允许您访问Netty内部结构，但总的来说，您可以更好地利用Vert.x提供的更高级别的API，而不会牺牲与_原始_Netty相比的性能。
 
-Vert.x does not impose any packaging or build environment.
-Since Vert.x core itself is just a regular Jar library it can be embedded inside applications packaged as a set of Jars, a single Jar with all dependencies, or it can even be deployed inside popular component and application containers.
+Vert.x不强加任何打包或构建环境。由于Vert.x核心本身只是一个常规的Jar库，因此它可以嵌入作为一组Jars的应用程序，一个具有所有依赖关系的Jar，或者甚至可以部署在流行的组件和应用程序容器中。
 
 Because Vert.x was designed for asynchronous communications it can deal with more concurrent network connections with less threads than synchronous APIs such as Java servlets or `java.net` socket classes.
 Vert.x is useful for a large range of applications: high volume message / event processing, micro-services, API gateways, HTTP APIs for mobile applications, etc.
