@@ -28,20 +28,15 @@ Eclipse Vert.x是在JVM上构建响应式应用程序的工具包。
 
 Eclipse Vert.x (我们将在本文档的其余部分中称为Vert.x)是Eclipse Foundation的一个开源项目。Vert.x于2012年由Tim Fox发起。
 
-Vert.x不是一个框架，而是一个工具包：核心库定义了用于编写异步网络应用程序的基本API，您可以为您的应用程序选择有用的模块（例如数据库连接，监控，认证，日志记录，服务发现，集群支持等）。 Vert.x基于http://netty.io/[Netty项目]，这是JVM的高性能异步网络库。_如果需要_，Vert.x将允许您访问Netty内部结构，但总的来说，您可以更好地利用Vert.x提供的更高级别的API，而不会牺牲与_原始_Netty相比的性能。
+Vert.x不是一个框架，而是一个工具包：核心库定义了用于编写异步网络应用程序的基本API，您可以为您的应用程序选择有用的模块（例如数据库连接，监控，认证，日志记录，服务发现，集群支持等）。 Vert.x基于 http://netty.io/[Netty项目]，这是JVM的高性能异步网络库。_如果需要_，Vert.x将允许您访问Netty内部结构，但总的来说，您可以更好地利用Vert.x提供的更高级别的API，而不会牺牲与_原始_Netty相比的性能。
 
 Vert.x不强加任何打包或构建环境。由于Vert.x核心本身只是一个常规的Jar库，因此它可以嵌入作为一组Jars的应用程序，一个具有所有依赖关系的Jar，或者甚至可以部署在流行的组件和应用程序容器中。
 
-Because Vert.x was designed for asynchronous communications it can deal with more concurrent network connections with less threads than synchronous APIs such as Java servlets or `java.net` socket classes.
-Vert.x is useful for a large range of applications: high volume message / event processing, micro-services, API gateways, HTTP APIs for mobile applications, etc.
-Vert.x and its ecosystem provide all sorts of technical tools for building end-to-end reactive applications.
+因为Vert.x是为异步通信而设计的，所以它可以用比同步API（比如Java servlet或java.net套接字类）更少的线程来处理更多的并发网络连接。 Vert.x适用于大量应用程序：高容量消息/事件处理，微服务，API网关，用于移动应用程序的HTTP API等。Vert.x及其生态系统提供各种技术工具，端到端的响应式应用。
 
-While it may sound like Vert.x is only useful for demanding applications, the present guide also states that Vert.x works very well for more traditional web applications.
-As we will see, the code will remain relatively easy to comprehend, but if the application needs to face a sudden peak in traffic then the code is already written with the essential ingredient for scaling up: _asynchronous processing of events_.
+虽然听起来Vert.x只适用于要求苛刻的应用程序，但本指南还指出，Vert.x对于更传统的Web应用程序非常适用。 正如我们将看到的那样，代码仍然相对容易理解，但是如果应用程序需要面对流量的突然高峰，那么代码已经被写入了扩展的基本要素：_事件的异步处理_。
 
-Finally, it is worth mentioning that Vert.x is _polyglot_ as it supports a wide range of popular JVM languages: Java, Groovy, Scala, Kotlin, JavaScript, Ruby and Ceylon.
-The goal when supporting a language in Vert.x is not just to provide access to the APIs, but also to make sure that the language-specific APIs are idiomatic in each target language (e.g., using Scala futures in place of Vert.x futures).
-It is well-possible to develop different technical parts of a Vert.x application using different JVM languages.
+最后，值得一提的是，Vert.x是_使用多种语言的_，因为它支持各种流行的JVM语言：Java，Groovy，Scala，Kotlin，JavaScript，Ruby和Ceylon。 在Vert.x中支持语言的目标不仅仅是提供对API的访问，还要确保语言特定的API在每种目标语言中都是惯用的（例如，使用Scala的futures代替Vert.x的futures）。 使用不同的JVM语言开发Vert.x应用程序的不同技术部分是完全可能的。
 
 == Core Vert.x concepts
 
