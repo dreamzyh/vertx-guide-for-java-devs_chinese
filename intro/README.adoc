@@ -38,23 +38,18 @@ Vert.x不强加任何打包或构建环境。由于Vert.x核心本身只是一�
 
 最后，值得一提的是，Vert.x是_使用多种语言的_，因为它支持各种流行的JVM语言：Java，Groovy，Scala，Kotlin，JavaScript，Ruby和Ceylon。 在Vert.x中支持语言的目标不仅仅是提供对API的访问，还要确保语言特定的API在每种目标语言中都是惯用的（例如，使用Scala的futures代替Vert.x的futures）。 使用不同的JVM语言开发Vert.x应用程序的不同技术部分是完全可能的。
 
-== Core Vert.x concepts
+== 核心Vert.x的概念
 
-There are 2 key concepts to learn in Vert.x:
+在Vert.x中有两个关键概念要学习：
 
-1. what a _verticle_ is, and
-2. how the _event bus_ allows verticles to communicate.
+1. _verticle_是什么。what a _verticle_ is, and
+2. _事件总线(event bus)_如何允许verticle通信。
 
-=== Threading and programming models
+=== 线程和编程模型
 
-Many networking libraries and frameworks rely on a simple threading strategy: each network client is being assigned a thread upon connection, and this thread deals with the client until it disconnects.
-This is the case with Servlet or networking code written with the `java.io` and `java.net` packages.
-While this _"synchronous I/O"_ threading model has the advantage of remaining simple to comprehend, it hurts scalability with too many concurrent connections as system threads are not cheap, and under heavy loads an operating system kernel spends significant time _just_ on thread scheduling management.
-In such cases we need to move to _"asynchronous I/O"_ for which Vert.x provides a solid foundation. 
+许多网络库和框架依赖于一个简单的线程策略：每个网络客户端在连接时被分配一个线程，并且这个线程处理客户端，直到它断开连接。 Servlet或使用java.io和java.net包编写的网络代码就是这种情况。虽然这种“同步I/O”线程模型具有保持简单易懂的优点，但是由于系统线程不便宜，所以它具有太多的并发连接的可扩展性，并且在繁重的负载下，操作系统内核在线程调度管理上花费了大量的时间。在这种情况下，我们需要转移到Vert.x提供坚实基础的_“异步I/O”_。 
 
-The unit of deployment in Vert.x is called a _Verticle_.
-A verticle processes incoming events over an _event-loop_, where events can be anything like receiving network buffers, timing events, or messages sent by other verticles.
-Event-loops are typical in asynchronous programming models: 
+Vert.x中的部署单位称为_Verticle_。 Verticle通过_事件循环_处理传入事件，其中事件可以是接收网络缓冲区，定时事件或其他Verticle发送的消息。在异步编程模型中，事件循环是非常典型的：
 
 image::images/event-loop.png[]
 
