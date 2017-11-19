@@ -6,26 +6,25 @@
 
 我们假设读者熟悉Java编程语言及其生态系统。
 
-我们将从一个由关系数据库和服务器端页面渲染支持的wiki Web应用程序开始;那么我们将通过几个步骤来改进应用程序，直到它成为一个具有“实时性”.footnote:[Note that the widespread usage of the term "real-time" in the context of web technologies shall not be confused with _hard_ or _soft_ real-time in specialized operating systems.] 网站功能的现代单页面应用程序。随着时间的推移，你会学到：
+我们将从一个由关系数据库和服务器端页面渲染支持的wiki Web应用程序开始;那么我们将通过几个步骤来改进应用程序，直到它成为一个具有“实时性”footnote:[Note that the widespread usage of the term "real-time" in the context of web technologies shall not be confused with _hard_ or _soft_ real-time in specialized operating systems.] 网站功能的现代单页面应用程序。随着时间的推移，你会学到：
 
-1. Design a web application with server-side rendering of pages through templates, and using a relational database for persisting data.
-2. Cleanly isolate each technical component as a reusable event processing unit called a _verticle_.
-3. Extract Vert.x services for facilitating the design of verticles that communicate with each other seamlessly both within the same JVM process or among distributed nodes in a cluster.
-4. Testing code with asynchronous operations.
-5. Integrating with third-party services exposing a HTTP/JSON web API.
-6. Exposing a HTTP/JSON web API.
-7. Securing and controlling access using HTTPS, user authentication for web browser sessions and JWT tokens for third-party client applications.
-8. Refactoring some code to use reactive programming with the popular RxJava library and its Vert.x integration.
-9. Client-side programming of a single-page application with AngularJS.
-10. Real-time web programming using the unified Vert.x event bus integration over SockJS.
+1. 通过模板设计一个网页应用程序，使用服务器端的页面渲染，并使用关系数据库来保存数据。
+2. 清洁隔离每个技术组件作为可重用的事件处理单元称为_(verticle)_。
+3. 提取Vert.x服务，以便在同一JVM进程内或集群中的分布式节点之间无缝地相互通信的Verticle的设计。
+4. 用异步操作测试代码。
+5. 与暴露HTTP / JSON Web API的第三方服务集成。
+6. 公开HTTP / JSON Web API。
+7. 使用HTTPS保护和控制访问，Web浏览器会话的用户身份验证和第三方客户端应用程序的JWT令牌。
+8. 重构一些代码，使用流行的RxJava库和Vert.x集成的响应式编程。
+9. 使用AngularJS对单页面应用程序进行客户端编程。
+10. 使用统一的Vert.x事件总线集成在SockJS上的实时Web编程。
 
-NOTE: The source of both this document and the code examples are available from https://github.com/vert-x3/vertx-guide-for-java-devs.
-We welcome issue reports, feedback and pull-requests!
+注释：这个文档和代码示例的来源可以从https://github.com/vert-x3/vertx-guide-for-java-devs获得。 我们欢迎问题报告，反馈和推送请求！
 
-== What is Vert.x?
+== 什么是Vert.x?
 
-[quote, Vert.x website]
-Eclipse Vert.x is a toolkit for building reactive applications on the JVM.
+[quote, Vert.x 网站]
+Vert.x是在JVM上构建响应式应用程序的工具包。
 
 Eclipse Vert.x (which we will just call _Vert.x_ in the remainder of this document) is an opensource project at the Eclipse Foundation.
 Vert.x was initiated in 2012 by Tim Fox.
