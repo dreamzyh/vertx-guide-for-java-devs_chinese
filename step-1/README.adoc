@@ -35,8 +35,7 @@ Vert.x社区提供了可以克隆的来自https://github.com/vert-x3/vertx-maven
 
 [NOTE]
 ====
-或者，Fabric8项目托管一个 https://vmp.fabric8.io/[a Vert.x Maven plugin]。 它的目标是初始化，构建，打包和运行Vert.x项目。Alternatively, the Fabric8 project hosts https://vmp.fabric8.io/[a Vert.x Maven plugin].
-It has goals to initialize, build, package and run a Vert.x project.
+或者，Fabric8项目托管一个 https://vmp.fabric8.io/[a Vert.x Maven plugin]。 它的目标是初始化，构建，打包和运行Vert.x项目。
 
 通过克隆Git启动器存储库来生成一个类似的项目：
 
@@ -47,38 +46,35 @@ It has goals to initialize, build, package and run a Vert.x project.
 
 ====
 
-== 添加所需的依赖关系Adding the required dependencies
+== 添加所需的依赖关系
 
-要添加到Maven `pom.xml` 文件的第一批依赖关系是用于Web处理和呈现的：The first batch of dependencies to add to the Maven `pom.xml` file are those for the web processing and rendering:
+要添加到Maven `pom.xml` 文件的第一批依赖关系是用于Web处理和呈现的：
 
 [source,xml,indent=0]
 ----
 include::pom.xml[tags=web-deps]
 ----
 
-TIP: As the `vertx-web-templ-freemarker` name suggests, Vert.x web provides pluggable support for popular template engines: Handlebars, Jade, MVEL, Pebble, Thymeleaf and of course Freemarker.
+TIP: 正如 `vertx-web-templ-freemarker` 的名字所暗示的，Vert.x web为流行的模板引擎提供可插入的支持：Handlebars，Jade，MVEL，Pebble，Thymeleaf，当然还有Freemarker。
 
-The second set of dependencies are those required for JDBC database access:
+依赖关系的第二次设置是那些JDBC数据库访问所需的：
 
 [source,xml,indent=0]
 ----
 include::pom.xml[tags=db-deps]
 ----
 
-The Vert.x JDBC client library provides access to any JDBC-compliant database, but of course our project needs to have a JDBC driver on the _classpath_.
+Vert.x JDBC客户端库提供对任何JDBC兼容数据库的访问，但是当然我们的项目需要在 _classpath_ 上有一个JDBC驱动程序。
 
-http://hsqldb.org/[HSQLDB] is well-known relational database that is written in Java.
-It is quite popular when used as an embedded database to avoid the requirement of having a third-party database server running separately.
-It is also popular for unit and integration testing as it offers a (volatile) in-memory storage.
+http://hsqldb.org/[HSQLDB] 是用Java编写的著名关系数据库。 用作嵌入式数据库，以避免需要单独运行第三方数据库服务器时非常流行。 它在单元和集成测试中也很受欢迎，因为它提供了一个（易失性）内存存储。
 
-HSQLDB as an embedded database is a good fit to get us started.
-It stores data in local files, and since the HSQLDB library Jar provides a JDBC driver the Vert.x JDBC configuration will be straightforward.
+HSQLDB作为嵌入式数据库非常适合我们开始。 它将数据存储在本地文件中，而且由于HSQLDB库Jar提供了一个JDBC驱动程序，所以Vert.x JDBC配置将很简单。
 
 [NOTE]
 ====
-Vert.x also offers dedicated http://vertx.io/docs/vertx-mysql-postgresql-client/java/[MySQL and PostgreSQL client] libraries.
+Vert.x还提供专用的 http://vertx.io/docs/vertx-mysql-postgresql-client/java/[MySQL和PostgreSQL客户端库]。
 
-Of course you can use the general-purpose Vert.x JDBC client to connect to MySQL or PostgreSQL databases, but these libraries offers better performance by working with these 2 database server network protocols rather than going through the (blocking) JDBC APIs.
+当然，您可以使用通用Vert.x JDBC客户端连接到MySQL或PostgreSQL数据库，但这些库通过使用这两种数据库服务器网络协议而不是通过（阻塞）JDBC API来提供更好的性能。
 ====
 
 NOTE: Vert.x also provides libraries to deal with the popular non-relational databases http://vertx.io/docs/vertx-mongo-client/java/[MongoDB] and http://vertx.io/docs/vertx-redis-client/java/[Redis].
