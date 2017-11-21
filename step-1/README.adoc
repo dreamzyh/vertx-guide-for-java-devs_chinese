@@ -1,21 +1,19 @@
-= A minimally viable wiki written with Vert.x
+= 用Vert.x编写的最小可使用的wiki
 
-TIP: The corresponding source code is in the `step-1` folder of the guide repository.
+TIP: 相应的源代码位于指南存储库的 `step-1` 文件夹中。
 
-We are going to start with a first iteration and the simplest code possible to have a wiki written with Vert.x.
-While the next iterations will introduce more elegance into the code base as well as proper testing, we will see that quick prototyping with Vert.x is both a simple and a realistic target.
+我们将从第一次迭代开始，最简单的代码可能是用Vert.x编写一个wiki。 虽然接下来的迭代将会在代码库中引入更多的功能以及正确的测试，但是我们将会看到，使用Vert.x进行快速原型设计既是一个简单而又实际的选择。
 
-At this stage the wiki will use server-side rendering of HTML pages and data persistence through a JDBC connection.
-To do so, we will use the following libraries.
+在这个阶段，wiki将使用HTML页面的服务器端呈现和通过JDBC进行数据持久性。 为此，我们将使用以下库。
 
-1. http://vertx.io/docs/vertx-web/java/[Vert.x web] as while the Vert.x core library _does_ support the creation of HTTP servers, it does not provide elegant APIs to deal with routing, handling of request payloads, etc.
-2. http://vertx.io/docs/vertx-jdbc-client/java/[Vert.x JDBC client] to provide an asynchronous API over JDBC.
-3. http://freemarker.org/[Apache FreeMarker] to render server-side pages as it is an uncomplicated template engine.
-4. https://github.com/rjeschke/txtmark[Txtmark] to render Markdown text to HTML, allowing the edition of wiki pages in Markdown.
+1. http://vertx.io/docs/vertx-web/java/[Vert.x web]作为Vert.x核心库支持创建HTTP服务器，但不提供简洁的API来处理路由，处理请求的有效载荷等。
+2. http://vertx.io/docs/vertx-jdbc-client/java/[Vert.x JDBC 客户端]通过JDBC提供异步API。
+3. http://freemarker.org/[Apache FreeMarker]渲染服务器端页面，因为它是一个简单的模板引擎。
+4. https://github.com/rjeschke/txtmark[Txtmark]将Markdown文本呈现为HTML，允许在Markdown中编辑wiki页面。
 
-== Bootstrapping a Maven project
+== 引导一个Maven项目
 
-This guide makes the choice of using https://maven.apache.org[Apache Maven] as the build tool, primarily because it is very well integrated with the major integrated development environments.
+本指南选择使用 https://maven.apache.org[Apache Maven]作为构建工具，主要是因为它与主要的集成开发环境很好地结合在一起。 您可以同样使用另一个构建工具，如 https://gradle.org/[Gradle]。This guide makes the choice of using https://maven.apache.org[Apache Maven] as the build tool, primarily because it is very well integrated with the major integrated development environments.
 You can equally use another build tool such as https://gradle.org/[Gradle].
 
 The Vert.x community offers a template project structure from https://github.com/vert-x3/vertx-maven-starter that can be cloned.
