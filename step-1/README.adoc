@@ -77,8 +77,7 @@ Vert.x还提供专用的 http://vertx.io/docs/vertx-mysql-postgresql-client/java
 当然，您可以使用通用Vert.x JDBC客户端连接到MySQL或PostgreSQL数据库，但这些库通过使用这两种数据库服务器网络协议而不是通过（阻塞）JDBC API来提供更好的性能。
 ====
 
-NOTE: Vert.x also provides libraries to deal with the popular non-relational databases http://vertx.io/docs/vertx-mongo-client/java/[MongoDB] and http://vertx.io/docs/vertx-redis-client/java/[Redis].
-The larger community offers integration with other storage systems like Apache Cassandra, OrientDB or ElasticSearch.
+NOTE: Vert.x还提供库来处理流行的非关系数据库 http://vertx.io/docs/vertx-mongo-client/java/[MongoDB]和 http://vertx.io/docs/vertx-redis-client/java/[Redis]。 较大的社区提供与Apache Cassandra，OrientDB或ElasticSearch等其他存储系统的集成。
 
 == Anatomy of a verticle
 
