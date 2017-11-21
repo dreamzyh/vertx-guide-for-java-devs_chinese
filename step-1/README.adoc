@@ -13,36 +13,32 @@ TIP: 相应的源代码位于指南存储库的 `step-1` 文件夹中。
 
 == 引导一个Maven项目
 
-本指南选择使用 https://maven.apache.org[Apache Maven]作为构建工具，主要是因为它与主要的集成开发环境很好地结合在一起。 您可以同样使用另一个构建工具，如 https://gradle.org/[Gradle]。This guide makes the choice of using https://maven.apache.org[Apache Maven] as the build tool, primarily because it is very well integrated with the major integrated development environments.
-You can equally use another build tool such as https://gradle.org/[Gradle].
+本指南选择使用 https://maven.apache.org[Apache Maven]作为构建工具，主要是因为它与主要的集成开发环境很好地结合在一起。 您可以同样使用另一个构建工具，如 https://gradle.org/[Gradle]。
 
-The Vert.x community offers a template project structure from https://github.com/vert-x3/vertx-maven-starter that can be cloned.
-Since you will likely want to use (Git) version control as well, the fastest route is to clone the repository, delete its `.git/` folder and then create a new Git repository:
+Vert.x社区提供了可以克隆的来自https://github.com/vert-x3/vertx-maven-starter的模板项目结构。 由于您也可能想要使用（Git）版本控制，最快的方法是克隆存储库，删除其 `.git/` 文件夹，然后创建一个新的Git存储库：
 
     git clone https://github.com/vert-x3/vertx-maven-starter.git vertx-wiki
     cd vertx-wiki
     rm -rf .git
     git init
 
-The project offers a sample verticle as well as a unit test.
-You can safely delete all `.java` files beneath `src/` to hack on the wiki, but before doing so you may test that the project builds and runs successfully:
+该项目提供了一个简单的verticle以及单元测试。 您可以安全地删除 `src/` 下的所有 `.java` 文件来破解wiki，但在这之前，您可以测试项目是否成功建立并运行：
 
     mvn package exec:java
 
-You will notice that the Maven project `pom.xml` does 2 interesting things:
+你会注意到Maven项目的 `pom.xml` 有两个有趣的事情：
 
-1. it uses the https://maven.apache.org/plugins/maven-shade-plugin/[Maven Shade Plugin] to create a single Jar archive with all required dependencies, suffixed by `-fat.jar`, also called _"a fat Jar"_, and
-2. it uses the http://www.mojohaus.org/exec-maven-plugin/[Exec Maven Plugin] to provide the `exec:java` goal that in turns starts the application through the Vert.x `io.vertx.core.Launcher` class. This is actually equivalent to running using the `vertx` command-line tool that ships in the Vert.x distribution.
+1. 它使用 https://maven.apache.org/plugins/maven-shade-plugin/[Maven Shade Plugin]创建一个具有所有必需依赖项的单个Jar归档文件，后缀为 `-fat.jar`，也称为“fat Jar”
+2. 它使用 http://www.mojohaus.org/exec-maven-plugin/[Exec Maven Plugin] 来提供 `exec:java` 目标，依次通过Vert.x的 `io.vertx.core.Launcher`类启动应用程序。 这实际上相当于使用Vert.x发行版中的 `vertx`命令行工具来运行。
 
-Finally, you will notice the presence of the `redeploy.sh` and `redeploy.bat` scripts that you can alternatively use for automatic compilation and redeployment upon code changes.
-Note that doing so requires ensuring that the `VERTICLE` variable in these scripts matches the main verticle to be used.
+最后，您会注意到 `redeploy.sh` 和 `redeploy.bat` 脚本的存在，您可以使用它们在代码更改时自动编译和重新部署。 请注意，这样做需要确保这些脚本中的 `VERTICLE` 变量与要使用的主Verticle相匹配。
 
 [NOTE]
 ====
-Alternatively, the Fabric8 project hosts https://vmp.fabric8.io/[a Vert.x Maven plugin].
+或者，Fabric8项目托管一个 https://vmp.fabric8.io/[a Vert.x Maven plugin]。 它的目标是初始化，构建，打包和运行Vert.x项目。Alternatively, the Fabric8 project hosts https://vmp.fabric8.io/[a Vert.x Maven plugin].
 It has goals to initialize, build, package and run a Vert.x project.
 
-To generate a similar project as by cloning the Git starter repository:
+通过克隆Git启动器存储库来生成一个类似的项目：
 
     mkdir vertx-wiki
     cd vertx-wiki
@@ -51,9 +47,9 @@ To generate a similar project as by cloning the Git starter repository:
 
 ====
 
-== Adding the required dependencies
+== 添加所需的依赖关系Adding the required dependencies
 
-The first batch of dependencies to add to the Maven `pom.xml` file are those for the web processing and rendering:
+要添加到Maven `pom.xml` 文件的第一批依赖关系是用于Web处理和呈现的：The first batch of dependencies to add to the Maven `pom.xml` file are those for the web processing and rendering:
 
 [source,xml,indent=0]
 ----
