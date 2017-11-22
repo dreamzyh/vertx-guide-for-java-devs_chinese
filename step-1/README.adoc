@@ -79,16 +79,15 @@ Vert.x还提供专用的 http://vertx.io/docs/vertx-mysql-postgresql-client/java
 
 NOTE: Vert.x还提供库来处理流行的非关系数据库 http://vertx.io/docs/vertx-mongo-client/java/[MongoDB]和 http://vertx.io/docs/vertx-redis-client/java/[Redis]。 较大的社区提供与Apache Cassandra，OrientDB或ElasticSearch等其他存储系统的集成。
 
-== Anatomy of a verticle
+== verticle的解析
 
-The verticle for our wiki consists of a single `io.vertx.guides.wiki.MainVerticle` Java class.
-This class extends `io.vertx.core.AbstractVerticle`, the base class for verticles that mainly provides:
+我们的wiki的verticle由一个 `io.vertx.guides.wiki.MainVerticle` 的Java类组成。 这个类扩展了 `io.vertx.core.AbstractVerticle`，主要提供了Verticle的基类主要提供了如下：
 
-1. life-cycle `start` and `stop` methods to override,
-2. a _protected_ field called `vertx` that references the Vert.x environment where the verticle is being deployed,
-3. an accessor to some configuration object that allows passing external configuration to a verticle.
+1. 生命周期 `start` 和  `stop` 方法来覆盖
+2. 一个名为vertx的 _protected_ 字段，引用Verticle正在部署的Vert.x环境
+3. 一个配置对象的访问器，允许将外部配置传递给Verticle。
 
-To get started our verticle can just override the `start` method as follows:
+要开始我们的verticle可以覆盖 `start` 方法，如下所示:
 
 [source,java]
 ----
@@ -101,7 +100,7 @@ public class MainVerticle extends AbstractVerticle {
 }
 ----
 
-There are 2 forms of `start` (and `stop`) methods: 1 with no argument and 1 with a _future_ object reference.
+有 start` 和 `stop` 两种形式的方法：一个没有参数，一个有 _future_ 的对象引用。 无参数变体意味着verticle初始化或管家阶段总是成功，除非抛出异常。 具有未来对象的变体提供了更细粒度的方法，最终表明操作成功与否。 事实上，一些初始化或清理代码可能需要异步操作，所以通过未来的对象进行报告自然适合异步的习惯用法。There are 2 forms of `start` (and `stop`) methods: 1 with no argument and 1 with a _future_ object reference.
 The no-argument variants imply that the verticle initialization or house-keeping phases always succeed unless an exception is being thrown.
 The variants with a _future_ object provide a more fine-grained approach to _eventually_ signal that operations succeeded or not.
 Indeed, some initialization or cleanup code may require asynchronous operations, so reporting via a _future_ object naturally fits with asynchronous idioms.
