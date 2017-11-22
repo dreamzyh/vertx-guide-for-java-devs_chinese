@@ -100,12 +100,9 @@ public class MainVerticle extends AbstractVerticle {
 }
 ----
 
-有 start` 和 `stop` 两种形式的方法：一个没有参数，一个有 _future_ 的对象引用。 无参数变体意味着verticle初始化或管家阶段总是成功，除非抛出异常。 具有未来对象的变体提供了更细粒度的方法，最终表明操作成功与否。 事实上，一些初始化或清理代码可能需要异步操作，所以通过未来的对象进行报告自然适合异步的习惯用法。There are 2 forms of `start` (and `stop`) methods: 1 with no argument and 1 with a _future_ object reference.
-The no-argument variants imply that the verticle initialization or house-keeping phases always succeed unless an exception is being thrown.
-The variants with a _future_ object provide a more fine-grained approach to _eventually_ signal that operations succeeded or not.
-Indeed, some initialization or cleanup code may require asynchronous operations, so reporting via a _future_ object naturally fits with asynchronous idioms.
+有 `start` 和 `stop` 两种形式的方法：一个没有参数，一个有 _future_ 对象引用。 无参数变量意味着verticle初始化或内务阶段总是成功，除非抛出异常。 具有  _future_  对象的变量提供了更细粒度的方法，以最终表示操作成功与否。 事实上，一些初始化或I/O操作可能需要异步操作，所以含有 _future_ 对象的写法自然适合异步的习惯用法。
 
-== A word on Vert.x future objects and callbacks
+== 关于Vert.x的future对象和回调的介绍
 
 Vert.x futures are not JDK futures: they can be composed and queried in a non-blocking fashion.
 They shall be used for simple coordination of asynchronous tasks, and especially those of deploying verticles and checking if they were successfully deployed or not.
