@@ -129,16 +129,16 @@ foo.a(1, res1 -> {
 
 由于所有的Vert.x API都是在面向回调的，所以在像RxJava这样的其他抽象可以被利用之前，本指南只使用第一部分中的回调来确保读者熟悉Vert.x中的核心概念。从回调开始，在异步代码的许多部分之间画一条线也可以说比较容易。一旦在示例代码中发现回调并不总是容易读懂的代码，我们将引入RxJava支持来展示如何通过思考已处理事件流来更好地表达相同的异步代码。
 
-== Wiki verticle initialization phases
+== Wiki的verticle初始化阶段
 
-To get our wiki running, we need to perform a 2-phases initialization:
+为了让我们的wiki运行，我们需要执行两阶段初始化：To get our wiki running, we need to perform a 2-phases initialization:
 
-1. we need to establish a JDBC database connection, and also make sure that the database schema is in place, and
-2. we need to start a HTTP server for the web application.
+1. 我们需要建立一个JDBC数据库连接，并确保数据库模式(database schema)已经到位
+2. 我们需要为Web应用程序启动一个HTTP服务器。
 
-Each phase can fail (e.g., the HTTP server TCP port is already being used), and they should not run in parallel as the web application code first needs the database access to work.
+每个阶段都可能失败（例如，HTTP服务器的TCP端口已被使用），并且它们不应该并行运行，因为Web应用程序代码首先需要数据库访问才能工作。Each phase can fail (e.g., the HTTP server TCP port is already being used), and they should not run in parallel as the web application code first needs the database access to work.
 
-To make our code _cleaner_ we will define 1 method per phase, and adopt a pattern of returning a _future / promise_ object to notify when each of the phases completes, and whether it did so successfully or not:
+为了使代码更 _清晰_，我们将在每个阶段定义1个方法，并采用返回 _future/promise_ 对象的模式来通知每个阶段何时完成，以及是否成功完成：
 
 [source,java]
 ----
@@ -155,7 +155,7 @@ private Future<Void> startHttpServer() {
 }
 ----
 
-By having each method returning a _future_ object, the implementation of the `start` method becomes a composition:
+通过让每个方法返回一个 _future_ 对象，`start` 方法的实现变成一个组合：
 
 [source,java,indent=0]
 ----
