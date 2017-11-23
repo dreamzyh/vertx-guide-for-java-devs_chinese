@@ -170,33 +170,30 @@ include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=start]
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=another-start]
 ----
-<1> `ar` is of type `AsyncResult<Void>`.
-`AsyncResult<T>` is used to pass the result of an asynchronous processing and may either yield a value of type `T` on success or a failure exception is the processing failed.
+<1> `ar` 的类型是 `AsyncResult<Void>`。`AsyncResult<T>` 用于传递异步处理的结果，可能会在成功时产生的 `T` 类型的值，或者失败异常是处理失败。
 
-=== Database initialization
+=== 数据库初始化
 
-The wiki database schema consists of a single table `Pages` with the following columns:
+wiki数据库模式由一个表单 `Pages` 组成，其中包含以下列：
 
 [options="header"]
 |===
-|Column |Type |Description
+|列 |类型 |描述
 
 |`Id`
 |Integer
-|Primary key
+|主键(Primary key)
 
 |`Name`
 |Characters
-|Name of a wiki page, must be unique
+|wiki页面的名字，必须是唯一的
 
 |`Content`
 |Text
-|Markdown text of a wiki page
+|wiki页面的Markdown文本
 |===
 
-The database operations will be typical _create, read, update, delete_ operations.
-To get us started, we simply store the corresponding SQL queries as static fields of the `MainVerticle` class.
-Note that they are written in a SQL dialect that HSQLDB understands, but that other relational databases may not necessarily support:
+数据库操作将是典型的 _创建，读取，更新，删除_ 操作。 为了让我们开始，我们简单地将相应的SQL查询存储为  `MainVerticle` 类的静态字段。 请注意，它们是用HSQLDB可理解的SQL方言编写的，但其他关系数据库可能不一定支持：
 
 [source,java,indent=0]
 ----
