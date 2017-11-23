@@ -162,12 +162,9 @@ private Future<Void> startHttpServer() {
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=start]
 ----
 
-When the _future_ of `prepareDatabase` completes successfully, then `startHttpServer` is called and the `steps` future completes depending of the outcome of the future returned by `startHttpServer`.
-`startHttpServer` is never called if `prepareDatabase` encounters an error, in which case the `steps` _future_ is in a _failed_ state and becomes completed with the exception describing the error.
+当 `prepareDatabase` 的 _future_ 成功完成时， `startHttpServer` 被调用，并且 `steps` future 将根据 `startHttpServer` 的future 返回结果来完成。 如果 `prepareDatabase` 遇到错误，则 `startHttpServer` 将永远不会被调用，在这种情况下，`steps` _future_  将处于  _failed_ 状态，并且会以描述错误的异常来完成。
 
-Eventually `steps` completes: `setHandler` defines a handler to be called upon completion.
-In our case we simply want to complete `startFuture` with `steps` and use the `completer` method to obtain a handler.
-This is equivalent to:
+最终 `steps` 完成：`setHandler` 定义一个处理程序，在完成时调用。 在我们的例子中，我们只是想通过 `steps` 完成 `startFuture`，并使用 `completer` 方法来获得一个处理程序。 这相当于：
 
 [source,java,indent=0]
 ----
