@@ -106,8 +106,7 @@ public class MainVerticle extends AbstractVerticle {
 
 Vert.x的future不是JDK的future：它们可以以非阻塞的方式进行组合和查询。 它们应该用于简单协调异步任务，特别是部署Verticle并检查是否成功部署。
 
-Vert.x核心API基于回调来通知异步事件。 经验丰富的开发人员自然会认为，这为所谓的“回调地狱”打开了大门，其中多层次的嵌套回调使得代码难以理解，如这个虚构的代码所示：The Vert.x core APIs are based on callbacks to notify of asynchronous events.
-The seasoned developer will naturally think that this opens the door to the so-called _"callback hell"_ where multiple levels of nested callbacks render the code difficult to comprehend as illustrated by this fictional code:
+Vert.x核心API基于回调来通知异步事件。 经验丰富的开发人员自然会认为，这为所谓的“回调地狱”打开了大门，其中多层次的嵌套回调使得代码难以理解，如这个虚构的代码所示：
 
 [source,java]
 ----
@@ -126,12 +125,9 @@ foo.a(1, res1 -> {
 });
 ----
 
-While the core APIs could have been designed to favor promises and futures, the choice of callbacks is actually interesting since it allows different programming abstractions to be used.
-Vert.x is a largely un-opinionated project, and callbacks allow the implementation of different models that better cope with asynchronous programming: reactive extensions (via RxJava), promises and futures, fibers (using bytecode instrumentation), etc.
+虽然核心API可以被设计为有利于约定和future，回调的选择实际上是有趣的，因为它允许使用不同的编程抽象。 Vert.x是一个很大程度上没有意见的项目，回调允许实现更好地应对异步编程的不同模型：被动扩展（通过RxJava），约定和future，fibers（使用字节码工具）等。
 
-Since all Vert.x APIs are callback-oriented before other abstractions like RxJava can be leveraged, this guide only uses callbacks in the first sections to ensure that the reader gets familiar with the core concepts in Vert.x.
-It is also arguably easier to start with callbacks to draw a line between the many sections of asynchronous code.
-Once it becomes evident in the sample code that callbacks do not always lead to easily readable code, we will introduce the RxJava support to show how the same asynchronous code can be better expressed by thinking in streams of processed events.
+由于所有的Vert.x API都是在面向回调的，所以在像RxJava这样的其他抽象可以被利用之前，本指南只使用第一部分中的回调来确保读者熟悉Vert.x中的核心概念。从回调开始，在异步代码的许多部分之间画一条线也可以说比较容易。一旦在示例代码中发现回调并不总是容易读懂的代码，我们将引入RxJava支持来展示如何通过思考已处理事件流来更好地表达相同的异步代码。
 
 == Wiki verticle initialization phases
 
