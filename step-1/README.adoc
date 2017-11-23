@@ -199,32 +199,30 @@ wiki数据库模式由一个表单 `Pages` 组成，其中包含以下列：
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=sql-fields]
 ----
-<1> The `?` in the queries are placeholders to pass data when executing queries, and the Vert.x JDBC client prevents from SQL injections.
+<1> 这个 `?` 在查询中是占位符，在执行查询时传递数据，Vert.x JDBC客户端阻止SQL注入。
 
-The application verticle needs to keep a reference to a `JDBCClient` object (from the `io.vertx.ext.jdbc` package) that serves as the connection to the database.
-We do so using a field in `MainVerticle`, and we also create a general-purpose logger from the `org.slf4j` package:
+应用程序Verticle需要保留对作为数据库连接的 `JDBCClient` 对象（来自 `io.vertx.ext.jdbc` 包）的引用。 我们在 `MainVerticle` 中使用了一个字段，我们还从 `org.slf4j` 包创建了一个通用记录器：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=db-and-logger]
 ----
 
-Last but not least, here is the complete implementation of the `prepareDatabase` method.
-It attempts to obtain a JDBC client connection, then performs a SQL query to create the `Pages` table unless it already exists:
+最后但并非最不重要的，这里是 `prepareDatabase`  方法的完整实现。 它尝试获取JDBC客户端连接，然后执行SQL查询以创建 `Pages` 表，除非它已经存在：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=prepareDatabase]
 ----
-<1> `createShared` creates a shared connection to be shared among verticles known to the `vertx` instance, which in general is a good thing.
-<2> The JDBC client connection is made by passing a Vert.x JSON object. Here `url` is the JDBC URL.
-<3> Just like `url`, `driver_class` is specific to the JDBC driver being used and points to the driver class.
-<4> `max_pool_size` is the number of concurrent connections. We chose 30 here, but it is just an arbitrary number.
-<5> Getting a connection is an asynchronous operation that gives us an `AsyncResult<SQLConnection>`. It must then be tested to see if the connection could be established or not (`AsyncResult` is actually a super-interface of `Future`).
-<6> If the SQL connection could not be obtained, then the method _future_ is completed to fail with the `AsyncResult`-provided exception via the `cause` method.
-<7> The `SQLConnection` is the result of the successful `AsyncResult`. We can use it to perform a SQL query.
-<8> Before checking whether the SQL query succeeded or not, we must release it by calling `close`, otherwise the JDBC client connection pool can eventually drain.
-<9> We complete the method _future_ object with a success.
+<1> `createShared` 创建一个共享的连接，在 `vertx` 实例的已知verticle中共享，这通常是件好事。
+<2> JDBC客户端连接是通过传递一个Vert.x JSON对象来完成的。这里的 `url` 是JDBC的URL。
+<3> 就像  `url` 一样， `driver_class` 是特定于正在使用的JDBC驱动程序，并指向驱动程序类。
+<4> `max_pool_size` 是并发连接的数量。我们在这里选择了30个，但它只是一个任意数字。
+<5> 获取连接是一个异步操作，它为我们提供了一个 `AsyncResult<SQLConnection>` 。然后必须测试它是否可以建立连接（`AsyncResult`实际上是`Future`的父接口）。
+<6> 如果无法获得SQL连接，那么方法 _future_ 将通过 `cause` 方法以 `AsyncResult` 提供的异常完成失败处理。
+<7> `SQLConnection` 是成功的 `AsyncResult` 的结果。我们可以用它来执行一个SQL查询。
+<8> 在检查SQL查询是否成功之前，我们必须通过调用 `close` 来释放它，否则JDBC客户端连接池最终可能会耗尽。
+<9> 我们成功地完成方法 _future_ 对象。
 
 TIP: The SQL database modules supported by the Vert.x project do not currently offer anything beyond passing SQL queries (e.g., an object-relationnal mapper) as they focus on providing asynchronous access to databases.
 However, nothing forbids using https://github.com/vert-x3/vertx-awesome[more advanced modules from the community], and we especially recommend checking out projects like https://github.com/jklingsporn/vertx-jooq[this jOOq generator for Vert.x] or https://github.com/BraintagsGmbH/vertx-pojo-mapper[this POJO mapper].
