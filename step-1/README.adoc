@@ -104,10 +104,9 @@ public class MainVerticle extends AbstractVerticle {
 
 == 关于Vert.x的future对象和回调的介绍
 
-Vert.x futures are not JDK futures: they can be composed and queried in a non-blocking fashion.
-They shall be used for simple coordination of asynchronous tasks, and especially those of deploying verticles and checking if they were successfully deployed or not.
+Vert.x的future不是JDK的future：它们可以以非阻塞的方式进行组合和查询。 它们应该用于简单协调异步任务，特别是部署Verticle并检查是否成功部署。
 
-The Vert.x core APIs are based on callbacks to notify of asynchronous events.
+Vert.x核心API基于回调来通知异步事件。 经验丰富的开发人员自然会认为，这为所谓的“回调地狱”打开了大门，其中多层次的嵌套回调使得代码难以理解，如这个虚构的代码所示：The Vert.x core APIs are based on callbacks to notify of asynchronous events.
 The seasoned developer will naturally think that this opens the door to the so-called _"callback hell"_ where multiple levels of nested callbacks render the code difficult to comprehend as illustrated by this fictional code:
 
 [source,java]
