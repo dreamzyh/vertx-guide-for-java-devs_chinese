@@ -218,7 +218,7 @@ include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=prepareDataba
 <2> JDBC客户端连接是通过传递一个Vert.x JSON对象来完成的。这里的 `url` 是JDBC的URL。
 <3> 就像  `url` 一样， `driver_class` 是特定于正在使用的JDBC驱动程序，并指向驱动程序类。
 <4> `max_pool_size` 是并发连接的数量。我们在这里选择了30个，但它只是一个任意数字。
-<5> 获取连接是一个异步操作，它为我们提供了一个 `AsyncResult<SQLConnection>` 。然后必须测试它是否可以建立连接（`AsyncResult`实际上是`Future`的父接口）。
+<5> 获取连接是一个异步操作，它为我们提供了一个 `AsyncResult<SQLConnection>` 。然后必须测试它是否可以建立连接（ `AsyncResult` 实际上是 `Future` 的父接口）。
 <6> 如果无法获得SQL连接，那么方法 _future_ 将通过 `cause` 方法以 `AsyncResult` 提供的异常完成失败处理。
 <7> `SQLConnection` 是成功的 `AsyncResult` 的结果。我们可以用它来执行一个SQL查询。
 <8> 在检查SQL查询是否成功之前，我们必须通过调用 `close` 来释放它，否则JDBC客户端连接池最终可能会耗尽。
