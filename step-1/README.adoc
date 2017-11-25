@@ -224,7 +224,7 @@ include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=prepareDataba
 <8> 在检查SQL查询是否成功之前，我们必须通过调用 `close` 来释放它，否则JDBC客户端连接池最终可能会耗尽。
 <9> 我们成功地完成方法 _future_ 对象。
 
-TIP: The SQL database modules supported by the Vert.x project do not currently offer anything beyond passing SQL queries (e.g., an object-relationnal mapper) as they focus on providing asynchronous access to databases.
+TIP: 由Vert.x项目支持的SQL数据库模块目前除了传递SQL查询之外还没有提供任何东西（例如，对象关系映射器），因为它们专注于提供对数据库的异步访问。 然而，没有任何东西禁止使用 https://github.com/vert-x3/vertx-awesome[来自社区的更高级的模块]，我们特别推荐检查像Vert.x这样的jOOq生成器或者这个POJO映射器。The SQL database modules supported by the Vert.x project do not currently offer anything beyond passing SQL queries (e.g., an object-relationnal mapper) as they focus on providing asynchronous access to databases.
 However, nothing forbids using https://github.com/vert-x3/vertx-awesome[more advanced modules from the community], and we especially recommend checking out projects like https://github.com/jklingsporn/vertx-jooq[this jOOq generator for Vert.x] or https://github.com/BraintagsGmbH/vertx-pojo-mapper[this POJO mapper].
 
 === Notes about logging
