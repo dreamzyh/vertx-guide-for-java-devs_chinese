@@ -70,95 +70,89 @@ verticle类的前言主要由配置密钥定义组成：
 include::src/main/java/io/vertx/guides/wiki/WikiDatabaseVerticle.java[tags=preamble]
 ----
 
-SQL queries are being stored in a properties file, with the default ones for HSQLDB being located in `src/main/resources/db-queries.properties`:
+SQL查询存储在一个属性文件中，HSQLDB的默认值位于 `src/main/resources/db-queries.properties`  中:
 
 ----
 include::src/main/resources/db-queries.properties[tags=queries]
 ----
 
-The following code from the `WikiDatabaseVerticle` class loads the SQL queries from a file, and make them available from a map:
+以下代码来自 `WikiDatabaseVerticle` 类从文件中加载SQL查询，并使它们可以从map中获得：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/WikiDatabaseVerticle.java[tags=loadSqlQueries]
 ----
 
-We use the `SqlQuery` enumeration type to avoid string constants later in the code.
-The code of the verticle `start` method is the following:
+我们使用 `SqlQuery` 枚举类型来避免代码中的字符串常量。 Verticle的  `start` 方法的代码如下：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/WikiDatabaseVerticle.java[tags=start]
 ----
-<1> Interestingly we break an important principle in Vert.x which is to avoid blocking APIs, but since there are no asynchronous APIs for accessing resources on the classpath our options are limited. We could use the Vert.x `executeBlocking` method to offload the blocking I/O operations from the event loop to a worker thread, but since the data is very small there is no obvious benefit in doing so.
-<2> Here is an example of using SQL queries.
-<3> The `consumer` method registers an event bus destination handler.
+<1> 有趣的是，我们在Vert.x中突破了一个重要的原则，即避免阻塞API，但由于没有用于访问类路径上的资源的异步API，所以我们的选项是有限的。 我们可以使用Vert.x的 `executeBlocking` 方法将阻塞I/O操作从事件循环卸载，然后加载到工作线程中，但由于数据非常小，因此没有明显的优点去做它。
+<2> 这是一个使用SQL查询的例子。
+<3> `consumer` 方法注册到一个事件总线目标处理程序。
 
-=== Dispatching requests
+=== 调度请求
 
-The event bus message handler is the `onMessage` method:
+事件总线消息处理程序是 `onMessage` 方法：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/WikiDatabaseVerticle.java[tags=onMessage]
 ----
 
-We defined a `ErrorCodes` enumeration for errors, which we use to report back to the message sender.
-To do so, the `fail` method of the `Message` class provides a convenient shortcut to reply with an error, and the original message sender gets a failed `AsyncResult`.
+我们为错误定义了一个 `ErrorCodes` 枚举，我们用它来返回给消息发送者。 为此， `Message` 类的 `fail` 方法提供了一个方便的快捷方式来回复错误，并且原始邮件发件人获取失败的 `AsyncResult`。
 
-=== Reducing the JDBC client boilerplate
+=== 减少JDBC客户端的引用
 
-So far we have seen the _complete_ interaction to perform a SQL query:
+到目前为止，我们已经看到了完整的交互来执行SQL查询：
 
-1. retrieve a connection,
-2. perform requests,
-3. release the connection.
+1. 检索连接
+2. 执行请求
+3. 释放连接
 
-This leads to code where lots of error processing needs to happen for each asynchronous operation, as in:
+这导致代码中的每个异步操作需要发生大量错误处理，如下所示：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/WikiDatabaseVerticle.java[tags=query-with-connection]
 ----
 
-Starting from Vert.x 3.5.0, the JDBC client now supports _one-shot_ operations where a connection is being acquired to do a SQL operation, then released internally.
-The same code as above now reduces to:
+从Vert.x 3.5.0开始，JDBC客户端现在支持一次性操作，在该操作中正在获取连接以执行SQL操作，然后在内部发布。 与上面相同的代码现在简化为：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/WikiDatabaseVerticle.java[tags=query-simple-oneshot]
 ----
 
-This is very useful for cases where the connection is being acquired for a single operation.
-Performance-wise it is important to note that re-using a connection for chained SQL operations is better.
+这对于单个操作正在获取连接的情况非常有用。 在性能方面，重要的是要注意重用链接SQL操作的连接更好。
 
-The rest of the class consists of private methods called when `onMessage` dispatches incoming messages:
+该类的其余部分由 `onMessage` 分派传入消息时调用的私有方法组成：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/WikiDatabaseVerticle.java[tags=rest]
 ----
 
-== Deploying the verticles from a main verticle
+== 从主verticle部署Verticle
 
-We still have a `MainVerticle` class, but instead of containing all the business logic like in the initial iteration, its sole purpose is to bootstrap the application and deploy other verticles.
+我们仍然有一个 `MainVerticle` 类，但是不像初始迭代那样包含所有的业务逻辑，它的唯一目的是引导应用程序并部署其他Verticle。
 
-The code consists in deploying 1 instance of `WikiDatabaseVerticle` and 2 instances of `HttpServerVerticle` :
+代码包括部署的1个 `WikiDatabaseVerticle` 实例和2个 `HttpServerVerticle` 实例：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=main]
 ----
-<1> Deploying a verticle is an asynchronous operation, so we need a `Future` for that. The `String` parametric type is because a verticle gets an identifier when successfully deployed.
-<2> One option is to create a verticle instance with `new`, and pass the object reference to the `deploy` method. The `completer` return value is a handler that simply completes its future.
-<3> Sequential composition with `compose` allows to run one asynchronous operation after the other. When the initial future completes successfully, the composition function is invoked.
-<4> A class name as a string is also an option to specify a verticle to deploy. For other JVM languages string-based conventions allow a module / script to be specified.
-<5> The `DeploymentOption` class allows to specify a number of parameters and especially the number of instances to deploy.
-<6> The composition function returns the next future. Its completion will trigger the completion of the composite operation.
-<7> We define a handler that eventually completes the `MainVerticle` start future.
+<1> 部署一个Verticle是一个异步操作，所以我们需要一个 `Future` 。字符串参数类型是因为Verticle在成功部署时获取标识符。
+<2> 一种选择是用 `new` 创建一个Verticle实例，并将对象引用传递给 `deploy` 方法。 `completer` 返回值是一个简单地完成其future的处理程序。
+<3> 顺序合成与撰写允许运行一个接一个的异步操作。当最初的future成功完成时，组合函数会被调用。
+<4> 作为字符串的类名也是指定要部署verticle的选项。对于其他JVM语言，基于字符串的约定允许指定模块/脚本
+<5> `DeploymentOption` 类允许指定一些参数，特别是要部署的实例的数量。
+<6> 构成函数返回下一个的future。其完成将触发复合操作的完成。
+<7> 我们定义一个处理程序，最终完成 `MainVerticle` 的开始future。
 
-The astute reader will probably wonder how we can deploy the code for a HTTP server on the same TCP port twice and not expect any error for either of the instances, since the TCP port will already be in use.
-With many web frameworks we would need to choose different TCP ports, and have a frontal HTTP proxy to perform load balancing between the ports.
+敏锐的读者可能会想知道我们如何在同一个TCP端口上两次部署HTTP服务器的代码，并且不要有任何一个实例出现任何错误，因为TCP端口已经被使用了。对于许多Web框架，我们需要选择不同的TCP端口，并且有一个正面的HTTP代理来执行端口之间的负载平衡。
 
-There is no need to do that with Vert.x as multiple verticles can share the same TCP ports.
-Incoming connections are simply distributed in a round-robin fashion from accepting threads.
+Vert.x没有必要这样做，因为多个Verticle可以共享相同的TCP端口。传入连接只是以接受线程的方式循环分配。
