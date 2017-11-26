@@ -1,75 +1,69 @@
-= Refactoring into independent and reusable verticles
+= 重构成独立和可重用的Verticle
 
-TIP: The corresponding source code is in the `step-2` folder of the guide repository.
+TIP: 相应的源代码位于指南存储库的step-2文件夹中。
 
-The first iteration got us a working wiki application.
-Still, its implementation suffers from the following issues:
+第一次迭代给了我们一个工作的wiki应用程序。 尽管如此，它的实现仍然存在以下问题：
 
-1. HTTP requests processing and database access code are interleaved within the same methods, and
-2. lots of configuration data (e.g., port numbers, JDBC driver, etc) are hard-coded strings in the code.
+1. HTTP请求处理和数据库访问代码在相同的方法中交错
+2. 许多配置数据（例如，端口号，JDBC驱动程序等）都是代码中的硬编码字符串。
 
-== Architecture and technical choices
+== 架构和技术选择
 
-This second iteration is about refactoring the code into independent and reusable verticles:
+第二个迭代是将代码重构为独立的可重用的Verticle：
 
 image::images/verticles-refactoring.png[Verticles refactoring]
 
-We will deploy 2 verticles to deal with HTTP requests, and 1 verticle for encapsulating persistence through the database.
-The 2 resulting verticles will not have direct references to each other as they will only agree on destination names in the event bus as well as message formats.
-This provides a simple yet effective decoupling.
+我们将部署2个Verticle来处理HTTP请求，1个Verticle通过数据库来封装持久化。 由此产生的两个Verticle将不会彼此直接引用，因为它们只会在事件总线的目标名称以及消息格式进行交流。 这提供了一个简单而有效的解耦。
 
-The messages sent on the event bus will be encoded in JSON.
+事件总线上发送的消息将以JSON编码。 虽然Vert.x在事件总线上支持灵活的序列化方案以处理要求严格的或高度特定的上下文，但使用JSON数据通常是明智的选择。 使用JSON的另一个优点是它是一种与语言无关的文本格式。 由于Vert.x是 _支持多种开发语言_，JSON是一个理想选择，用于不同语言编写的verticle需要通过消息传递进行通信。The messages sent on the event bus will be encoded in JSON.
 While Vert.x supports flexible serialization schemes on the event bus for demanding or highly-specific contexts, it is generally a wise choice to go with JSON data.
 Another advantage of using JSON is that it is a language-agnostic text format.
 As Vert.x is _polyglot_, JSON is ideal shall verticles written in different languages need to communicate via message passing.
 
-== The HTTP server verticle
+== HTTP服务器verticle
 
-The verticle class preamble and `start` method look as follows:
+Verticle类的前言和 `start` 方法如下所示：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/HttpServerVerticle.java[tags=start]
 ----
-<1> We expose public constants for the verticle configuration parameters: the HTTP port number and the name of the event bus destination to post messages to the database verticle.
-<2> The `AbstractVerticle#config()` method allows accessing the verticle configuration that has been provided. The second parameter is a default value in case no specific value was given.
-<3> Configuration values can not just be `String` objects but also integers, boolean values, complex JSON data, etc.
+<1> 我们公开了verticle配置参数的公共常量：HTTP端口号和事件总线目的地的名称，以将消息发布到数据库verticle。
+<2> `AbstractVerticle#config()` 方法允许访问已经提供的verticle配置。 如果没有给定具体的值,第二个参数是默认值。
+<3> 配置值只是字符串对象，也可以是整数，布尔值，复杂的JSON数据等。
 
-The rest of the class is mostly an extract of the HTTP-only code, with what was previously database code being replaced with event bus messages.
-Here is the `indexHandler` method code:
+这个类的其余部分主要是纯HTTP代码的提取，之前的数据库代码被事件总线消息替代。 这里是 `indexHandler` 方法代码：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/HttpServerVerticle.java[tags=indexHandler]
 ----
-<1> The `vertx` object gives access to the event bus, and we send a message to queue for the database vertice.
-<2> Delivery options allow us to specify headers, payload codecs and timeouts.
-<3> Upon success a reply contains a payload.
+<1> `vertx` 对象可以访问事件总线，并且我们发送一条消息给数据库vertice的队列。
+<2> 传递选项允许我们指定标头，有效负载编解码器和超时。
+<3> 答复成功后，将包含一个有效载荷。
 
-As we can see, an event bus message consists of a body, options, and it can optionally expect a reply.
-In the event that no response is expected there is a variant of the `send` method does not have a handler.
+正如我们所看到的，一个事件总线消息由一个主体，选项组成，并且可以选择期待一个回复。 如果没有预期的响应，则 `send` 方法的变量没有对应的处理程序。
 
-We encode payloads as JSON objects, and we specify which action the database verticle should do through a message header called `action`.
+我们将有效载荷编码为JSON对象，并通过称为 `action` 的消息头指定数据库Verticle应执行的操作。
 
-The rest of the verticle code consists in the router handlers that also use the event-bus to fetch and store data:
+其余的Verticle代码包含路由器处理程序，它们也使用事件总线来获取和存储数据：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/HttpServerVerticle.java[tags=rest]
 ----
 
-== The database verticle
+== 数据库verticle
 
-Connecting to a database using JDBC requires of course a driver and configuration, which we had hard-coded in the first iteration.
+使用JDBC连接到数据库当然需要一个驱动程序和配置，这是我们在第一次迭代中硬编码的。
 
-=== Configurable SQL queries
+=== 可配置的SQL查询
 
-While the verticle will turn the previously hard-coded values to configuration parameters, we will also go a step further by loading the SQL queries from a properties file.
+虽然Verticle会将之前硬编码的值转换为配置参数，但是我们还将通过从属性文件中加载SQL查询来更进一步操作。
 
-The queries will be loaded from a file passed as a configuration parameter or from a default resource if none is being provided.
-The advantage of this approach is that the verticle can adapt both to different JDBC drivers _and_ SQL dialects.
+查询将从作为配置参数传递的文件或从默认资源（如果没有提供文件）中加载。 这种方法的优点是Verticle可以适应不同的JDBC驱动程序和SQL方言。
 
-The verticle class preamble consists mainly of configuration key definitions:
+verticle类的前言主要由配置密钥定义组成：
 
 [source,java,indent=0]
 ----
