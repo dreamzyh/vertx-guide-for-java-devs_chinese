@@ -237,72 +237,65 @@ TIP: 由Vert.x项目支持的SQL数据库模块目前除了传递SQL查询之外
 include::pom.xml[tags=logger]
 ----
 
-By default SLF4J outputs many log events to the console from Vert.x, Netty, C3PO and the wiki application.
-We can reduce the verbosity by adding the a `src/main/resources/logback.xml` configuration file (see https://logback.qos.ch/ for more details):
+默认情况下，SLF4J将来自Vert.x,Netty,C3PO和wiki应用程序的许多日志事件输出到控制台。 我们可以通过添加 `src/main/resources/logback.xml` 配置文件来减少冗长(详情请参阅 https://logback.qos.ch/)：
 
 [source,xml,indent=0]
 ----
 include::src/main/resources/logback.xml[tags=conf]
 ----
 
-Last but not least HSQLDB does not integrate well with loggers when embedded.
-By default it tries to reconfigure the logging system in place, so we need to disable it by passing a `-Dhsqldb.reconfig_logging=false` property to the Java Virtual Machine when executing applications.
+最后但并非最不重要的是，嵌入形式的HSQLDB不能很好地与记录器集成。 默认情况下，它会尝试重新配置日志系统，所以我们需要在执行应用程序时将 `-Dhsqldb.reconfig_logging=false` 属性传递给Java虚拟机来禁用它。
 
-=== HTTP server initialization
+=== HTTP服务器初始化
 
-The HTTP server makes use of the `vertx-web` project to easily define _dispatching routes_ for incoming HTTP requests.
-Indeed, the Vert.x core API allows to start HTTP servers and listen for incoming connections, but it does not provide any facility to, say, have different handlers depending on the requested URL or processing request bodies.
-This is the role of a _router_ as it dispatches requests to different processing handlers depending on the URL, the HTTP method, etc.
+HTTP服务器利用 `vertx-web` 项目很容易地为传入HTTP请求定义 _调度路由_ 。 实际上，Vert.x核心API允许启动HTTP服务器并侦听传入的连接，但是它不提供任何设施，例如根据请求的URL或处理请求体，有不同的处理程序。 这是路由器的任务，因为它根据URL，HTTP方法等将请求分派给不同的处理处理程序。
 
-The initialization consists in setting up a _request router_, then starting the HTTP server:
+初始化包括设置请求路由器，然后启动HTTP服务器：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=startHttpServer]
 ----
-<1> The `vertx` context object provides methods to create HTTP servers, clients, TCP/UDP servers and clients, etc.
-<2> The `Router` class comes from `vertx-web`: `io.vertx.ext.web.Router`.
-<3> Routes have their own handlers, and they can be defined by URL and/or by HTTP method. For short handlers a Java lambda is an option, but for more elaborated handlers it is a good idea to reference private methods instead. Note that URLs can be parametric: `/wiki/:page` will match a request like `/wiki/Hello`, in which case a `page` parameter will be available with value `Hello`.
-<4> This makes all HTTP POST requests got through a first handler, here `io.vertx.ext.web.handler.BodyHandler`. This handler automatically decodes the body from the HTTP requests (e.g., form submissions), which can then be manipulated as Vert.x buffer objects.
-<5> The router object can be used as a HTTP server handler, which then dispatches to other handlers as defined above.
-<6> Starting a HTTP server is an asynchronous operation, so an `AsyncResult<HttpServer>` needs to be checked for success. By the way the `8080` parameter specifies the TCP port to be used by the server.
+<1> `vertx` 上下文对象提供了创建HTTP服务器，客户端，TCP/UDP服务器和客户端等的方法。
+<2> `Router` 类来自 `vertx-web`: `io.vertx.ext.web.Router`。
+<3> 路由有自己的处理程序，可以通过URL和/或HTTP方法来定义路由。对于简短的处理程序，Java lambda是一个选项，但对于更详细的处理程序来说，引用私有方法是个好主意。请注意，URL可以是参数化的： `/wiki/:page` 将匹配 `/wiki/Hello` 这样的请求，在这种情况下， `page` 参数的值为 `Hello` 。
+<4> 这使得所有HTTP POST请求都通过第一个处理程序，在这里是 `io.vertx.ext.web.handler.BodyHandler` 。该处理程序自动将HTTP请求（例如表单提交）中的主体解码，然后可以将其作为Vert.x的buffer对象进行操作。
+<5> 路由器对象可以用作HTTP服务器处理程序，然后将其分派到上面定义的其他处理程序。
+<6> 启动HTTP服务器是一个异步操作，因此需要检查 `AsyncResult<HttpServer>` 是否成功。顺便说一句，`8080` 参数指定了服务器使用的TCP端口。
 
-== HTTP router handlers
+== HTTP路由器处理程序
 
-The HTTP router instance of the `startHttpServer` method points to different handlers based on URL patterns and HTTP methods.
-Each handlers deals with a HTTP request, performs a database query, and renders HTML from a FreeMarker template.
+`startHttpServer` 方法的HTTP路由器实例根据URL模式和HTTP方法指向不同的处理程序。 每个处理程序处理HTTP请求，执行数据库查询，并从FreeMarker模板呈现HTML。
 
-=== Index page handler
+=== 索引页处理程序
 
-The index page provides a list of pointers to all wiki entries and a field to create a new one:
-
+索引页面提供了一个指向所有wiki条目的指针列表和一个创建一个新条目的字段：
 image::images/index.png[Wiki index]
 
-The implementation is a straightforward `select *` SQL query where data is then passed to the FreeMarker engine to render the HTML response.
+该实现是一个简单的 `select *` SQL查询，然后将数据传递给FreeMarker引擎以呈现HTML响应。
 
-The `indexHandler` method code is as follows:
+`indexHandler` 方法的代码如下：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=indexHandler]
 ----
-<1> SQL query results are being returned as instances of `JsonArray` and `JsonObject`.
-<2> The `RoutingContext` instance can be used to put arbitrary key / value data that is then available from templates, or chained router handlers.
-<3> Rendering a template is an asynchronous operation that leads us to the usual `AsyncResult` handling pattern.
-<4> The `AsyncResult` contains the template rendering as a `String` in case of success, and we can end the HTTP response stream with the value.
-<5> In case of failure the `fail` method from `RoutingContext` provides a sensible way to return a HTTP 500 error to the HTTP client.
+<1> SQL查询结果作为JsonArray和JsonObject的实例返回。SQL query results are being returned as instances of `JsonArray` and `JsonObject`.
+<2> `RoutingContext` 实例可以用来放置从模板或链式路由器处理程序获得的任意键/值数据。
+<3> 渲染一个模板是一个异步操作，将我们导向通用的 `AsyncResult` 处理模式。Rendering a template is an asynchronous operation that leads us to the usual `AsyncResult` handling pattern.
+<4> 如果成功，`AsyncResult` 包含模板渲染为字符串，我们可以使用值结束HTTP响应流。The `AsyncResult` contains the template rendering as a `String` in case of success, and we can end the HTTP response stream with the value.
+<5> 在发生故障的情况下，来自 `RoutingContext` 的 `fail` 方法提供了一个合理的方法来将HTTP 500错误返回给HTTP客户端。
 
-FreeMarker templates shall be placed in the `src/main/resources/templates` folder.
-The `index.ftl` template code is as follows:
+FreeMarker模板应放置在 `src/main/resources/templates` 文件夹中。 index.ftl模板代码如下：
 
 [source,html]
 ----
 include::src/main/resources/templates/index.ftl[]
 ----
 
-Key / value data stored in the `RoutingContext` object is made available through the `context` FreeMarker variable.
+存储在 `RoutingContext` 对象中的键/值数据通过`context` FreeMarker变量可用。
 
-Since lots of templates have common header and footers, we extracted the following code in `header.ftl` and `footer.ftl`:
+由于大量模板具有通用的页眉和页脚，因此我们在 `header.ftl` 和 `footer.ftl` 中提取了以下代码：
 
 .`header.ftl`
 [source,html]
@@ -316,81 +309,78 @@ include::src/main/resources/templates/header.ftl[]
 include::src/main/resources/templates/footer.ftl[]
 ----
 
-=== Wiki page rendering handler
+=== Wiki页面渲染处理程序
 
-This handler deals with HTTP GET requests to have wiki pages being rendered, as in:
+该处理程序处理HTTP GET请求，以使wiki页面呈现，如下所示：
 
 image::images/page.png[Wiki page]
 
-The page also provides a button to edit the content in Markdown.
-Instead of having a separate handler and template, we simply rely on JavaScript and CSS to toggle the editor on and off when the button is being clicked:
+该页面还提供了一个按钮来编辑Markdown中的内容。 我们只需要依靠JavaScript和CSS在单击按钮时打开和关闭编辑器，而不是使用单独的处理程序和模板：
 
 image::images/edit.png[Wiki editor]
 
-The `pageRenderingHandler` method code is the following:
+`pageRenderingHandler` 方法代码如下：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=pageRenderingHandler]
 ----
-<1> URL parameters (`/wiki/:name` here) can be accessed through the context request object.
-<2> Passing argument values to SQL queries is done using a `JsonArray`, with the elements in order of the `?` symbols in the SQL query.
-<3> The `Processor` class comes from the _txtmark_ Markdown rendering library that we use.
+<1> 可以通过上下文请求对象访问URL参数(包含`/wiki/:name`)
+<2> 将参数值传递给SQL查询是使用 `JsonArray` 完成的，SQL查询中用`?` 标识符作为顺序元素
+<3> `Processor` 类 来自我们使用的 _txtmark_ Markdown渲染库。
 
-The `page.ftl` FreeMarker template code is as follows:
+`page.ftl` FreeMarker模板代码如下：
 
 [source,html]
 ----
 include::src/main/resources/templates/page.ftl[]
 ----
 
-=== Page creation handler
+=== 页面创建处理程序
 
-The index page offers a field to create a new page, and its surrounding HTML form points to a URL that is being managed by this handler.
-The strategy isn't actually to create a new entry in the database, but simply to redirect to a wiki page URL with the name to create.
-Since the wiki page doesn't exist, the `pageRenderingHandler` method will use a default text for new pages, and a user can eventually create that page by editing then saving it.
+索引页面提供了一个用于创建新页面的字段，它相关的HTML表单指向由该处理程序管理的URL。 该策略实际上并不是在数据库中创建新的条目，而是简单地重定向到具有要创建的名称的 wiki页面URL。 由于wiki页面不存在，`pageRenderingHandler` 方法将为新页面使用默认文本，用户最终可以通过编辑与保存来创建该页面。
 
-The handler is the `pageCreateHandler` method, and its implementation is a redirection through a HTTP 303 status code:
+处理程序是 `pageCreateHandler` 方法，它的实现是通过HTTP 303状态码重定向：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=pageCreateHandler]
 ----
 
-=== Page saving handler
+=== 页面保存处理程序
 
-The `pageUpdateHandler` method deals with HTTP POST requests when saving a wiki page.
-This happens both when updating an existing page (issuing a SQL `update` query) or saving a new page (issuing a SQL `insert` query):
+保存wiki页面时，`pageUpdateHandler` 方法处理HTTP POST请求。 在更新现有页面（发出SQL `update` 查询）或保存新页面（发出SQL `insert` 查询）时都会发生这种情况：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=pageUpdateHandler]
 ----
-<1> Form parameters sent through a HTTP POST request are available from the `RoutingContext` object. Note that without a `BodyHandler` within the `Router` configuration chain these values would not be available, and the form submission payload would need to be manually decoded from the HTTP POST request payload.
-<2> We rely on a form hidden field rendered in the `page.ftl` FreeMarker template to know if we are updating an existing page or saving a new page.
-<3> Again, preparing the SQL query with parameters uses a `JsonArray` to pass values.
-<4> The `updateWithParams` method is used for `insert` / `update` / `delete` SQL queries.
-<5> Upon success, we simply redirect to the page that has been edited.
+<1> 通过HTTP POST请求发送的表单参数可以从 `RoutingContext` 对象中获得。 请注意，如果路由器配置链中没有 `BodyHandler`，则这些值将不可用，并且表单提交有效内容将需要从HTTP POST请求有效内容中手动解码。
+<2> 我们依靠在 `page.ftl` FreeMarker模板中呈现的表单隐藏字段来知道我们是更新现有页面还是保存新页面。
+<3> 同样，准备使用参数的SQL查询可以使用 `JsonArray` 来传递值。
+<4> `updateWithParams` 方法用于 `insert` / `update` / `delete` SQL 查询.
+<5> 一旦成功，我们只需重定向到已编辑的页面。
 
-=== Page deletion handler
+=== 页删除处理程序
 
-The implementation of the `pageDeletionHandler` method is straightforward: given a wiki entry identifier, it issues a `delete` SQL query then redirects to the wiki index page:
+
+`pageDeletionHandler` 方法的实现很简单：给定一个wiki条目标识符，它发出一个 `delete` SQL查询然后重定向到wiki索引页面：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=pageDeletionHandler]
 ----
 
-== Running the application
+== 运行应用程序
 
-At this stage we have a working, self-contained wiki application.
+在这个阶段，我们有一个正在工作，独立的wiki应用程序。
 
-To run it we first need to build it with Maven:
+为了运行它，我们首先需要用Maven构建它：
 
     $ mvn clean package
 
-Since the build produces a Jar will all required dependencies embedded (including Vert.x and a JDBC database), running the wiki is as simple as:
+由于构建产生一个Jar需要嵌入所有的依赖关系（包括Vert.x和一个JDBC数据库），运行wiki就像这样简单：
 
     $ java -jar target/wiki-step-1-1.1.0-fat.jar
 
-You can then point your favorite web browser to http://localhost:8080/ and enjoy using the wiki.
+你可以使用你最喜欢的浏览器打开 http://localhost:8080/ 并且使用wiki。
