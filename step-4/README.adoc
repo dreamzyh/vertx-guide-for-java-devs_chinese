@@ -1,23 +1,21 @@
-= Testing Vert.x code
+= 测试Vert.x代码
 
-TIP: The corresponding source code is in the `step-4` folder of the guide repository.
+TIP: 相应的源代码位于指南存储库的step-4文件夹中。
 
-Up to this point we have been developing the wiki implementation without testing.
-This is of course not a good practice, so let us see how to write tests for Vert.x code.
+到目前为止，我们一直在开发未经测试的wiki实现。这当然不是一个好的做法，所以让我们看看如何编写Vert.x代码的测试。
 
-== Getting started
+== 开始
 
-The `vertx-unit` module provides utilities to test asynchronous operations in Vert.x.
-Aside from that, you can use your testing framework of choice like JUnit.
+`vertx-unit` 模块提供了用于在Vert.x中测试异步操作的实用程序。除此之外，你可以使用像JUnit这样的测试框架。
 
-With JUnit, the required Maven dependencies are the following:
+使用JUnit，所需的Maven依赖关系如下：
 
 [source,xml,indent=0]
 ----
 include::pom.xml[tags=test-deps]
 ----
 
-JUnit tests need to be annotated with the `VertxUnitRunner` runner to use the `vertx-unit` features:
+JUnit测试需要使用`VertxUnitRunner` 运行器进行注释，以使用 `vertx-unit` 特性：
 
 [source,java]
 ----
@@ -27,53 +25,50 @@ public class SomeTest {
 }
 ----
 
-With that runner, JUnit test and life-cycle methods accept a `TestContext` argument.
-This object provides access to basic assertions, a context to store data, and several async-oriented helpers that we will see in this section.
+使用该运行器，JUnit测试和生命周期方法接受 `TestContext` 参数。这个对象提供了对基本断言的访问，存储数据的上下文以及我们将在本节中看到的一些面向异步的助手。
 
-To illustrate that, let us consider an asynchronous scenario where we want to check that a timer task has been called once, and that a periodic task has been called 3 times.
-Since that code is asynchronous, the test method exits before the test completes, so making that test pass or fail also needs to be done in an asynchronous fashion:
+为了说明这一点，让我们考虑一个异步场景，我们要检查定时器任务是否被调用过一次，并且定时任务被调用了3次。由于该代码是异步的，所以测试方法在测试完成之前退出，因此使测试通过或失败也需要以异步方式完成：
 
 [source,java,indent=0]
 ----
 include::src/test/java/io/vertx/guides/wiki/database/WikiDatabaseVerticleTest.java[tags=async-basic]
 ----
-<1> `TestContext` is a parameter provided by the runner.
-<2> Since we are in unit tests, we need to create a Vert.x context.
-<3> Here is an example of a basic `TestContext` assertion.
-<4> We get a first `Async` object that can later be completed (or failed).
-<5> This `Async` object works as a countdown that completes successfully after 3 calls.
-<6> We complete when the timer fires.
-<7> Each periodic task tick triggers a countdown. The test passes when all `Async` objects have completed.
-<8> There is a default (long) timeout for asynchronous test cases, but it can be overridden through the JUnit `@Test` annotation.
+<1> `TestContext` 是运行器提供的参数。
+<2> 由于我们在单元测试中，我们需要创建一个Vert.x上下文。
+<3> 这是一个基本的 `TestContext` 断言的例子。
+<4> 我们得到第一个 `Async` 对象，以后可以完成（或失败）。
+<5> 这个 `Async` 对象作为一个倒计时，在3次调用后成功完成。
+<6> 定时器启动时我们完成。
+<7> 每个周期性任务滴答触发一个倒计时。当所有 `Async `对象完成时，测试通过。
+<8> 异步测试用例有一个默认（很长）的超时，但是可以通过JUnit `@Test` 注解来覆盖。
 
-== Testing database operations
+== 测试数据库操作
 
-The database service is a good fit for writing tests.
+数据库服务非常适合编写测试。
 
-We first need to deploy the database verticle.
-We will configure the JDBC connection to be HSQLDB with an in-memory storage, and upon success we will fetch a service proxy for our test cases.
+我们首先需要部署数据库verticle。我们将把JDBC连接配置成带有内存存储的HSQLDB，一旦成功，我们将为我们的测试用例获取一个服务代理。
 
-Since these operations are involving, we leverage the JUnit _before_ / _after_ life-cycle methods:
+由于这些操作涉及到，所以我们在生命周期方法之前/之后利用JUnit
 
 [source,java,indent=0]
 ----
 include::src/test/java/io/vertx/guides/wiki/database/WikiDatabaseVerticleTest.java[tags=prepare]
 ----
-<1> We only override some of the verticle settings, the others will have default values.
-<2> `asyncAssertSuccess` is useful to provide a handler that checks for the success of an asynchronous operation. There is a variant with no arguments, and a variant like this one where we can chain the result to another handler.
+<1> 我们只覆盖一些verticle设置，其他的将有默认值。
+<2> `asyncAssertSuccess` 对于提供一个检查异步操作是否成功的处理程序非常有用。有一个没有参数的变体，像这样的变体，我们可以将结果链接到另一个处理程序。
 
-Cleaning up the Vert.x context is straightforward, and again we use `asyncAssertSuccess` to ensure that no error was encountered:
+清理Vert.x上下文很简单，我们再次使用 `asyncAssertSuccess` 来确保没有遇到错误：
 
 [source,java,indent=0]
 ----
 include::src/test/java/io/vertx/guides/wiki/database/WikiDatabaseVerticleTest.java[tags=finish]
 ----
 
-The service operations are essentially CRUD operations, so a JUnit test case combining all of them is a fine way to test:
+服务操作本质上是CRUD操作，所以将所有这些测试用例组合起来的JUnit测试用例是一种很好的测试方法：
 
 [source,java,indent=0]
 ----
 include::src/test/java/io/vertx/guides/wiki/database/WikiDatabaseVerticleTest.java[tags=crud]
 ----
-<1> This is where the sole `Async` eventually completes.
-<2> This is an alternative to exiting the test case method and relying on a JUnit timeout. Here the execution on the test case thread waits until either the `Async` completes or the timeout period elapses.
+<1> 这是唯一的 `异步` 最终完成。
+<2> 这是退出测试用例方法并依赖JUnit超时的替代方法。这里测试用例线程的执行会一直等待，直到 `异步` 完成或者超时时间结束。
