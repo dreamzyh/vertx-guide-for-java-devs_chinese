@@ -224,16 +224,13 @@ include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=prepareDataba
 <8> 在检查SQL查询是否成功之前，我们必须通过调用 `close` 来释放它，否则JDBC客户端连接池最终可能会耗尽。
 <9> 我们成功地完成方法 _future_ 对象。
 
-TIP: 由Vert.x项目支持的SQL数据库模块目前除了传递SQL查询之外还没有提供任何东西（例如，对象关系映射器），因为它们专注于提供对数据库的异步访问。 然而，没有任何东西禁止使用 https://github.com/vert-x3/vertx-awesome[来自社区的更高级的模块]，我们特别推荐成熟的项目，比如 https://github.com/jklingsporn/vertx-jooq[this jOOq generator for Vert.x] 或 https://github.com/BraintagsGmbH/vertx-pojo-mapper[this POJO mapper]。
+TIP: 由Vert.x项目支持的SQL数据库模块目前除了传递SQL查询之外还没有提供任何东西（例如，对象关系映射器），因为它们专注于提供对数据库的异步访问。 然而，没有任何东西禁止使用 https://github.com/vert-x3/vertx-awesome[来自社区的更高级的模块]，我们特别推荐成熟的项目，比如 https://github.com/jklingsporn/vertx-jooq[jOOq generator for Vert.x] 或 https://github.com/BraintagsGmbH/vertx-pojo-mapper[POJO mapper]。
 
-=== Notes about logging
+=== 有关日志的说明
 
-The previous subsection introduced a logger, and we opted for the https://www.slf4j.org/[SFL4J library].
-Vert.x is also unopinionated on logging: you can choose any popular Java logging library.
-We recommend SLF4J since it is a popular logging abstraction and unification library in the Java ecosystem.
+前面的小节介绍了一个记录器，我们选择了 https://www.slf4j.org/[SFL4J] 库。 在日志记录中,Vert.x也是没有指定的：您可以选择任何流行的Java日志记录库。 我们推荐SLF4J，因为它是Java生态系统中流行的日志抽象和统一库。
 
-We also recommend using https://logback.qos.ch/[Logback] as a logger implementation.
-Integrating both SLF4J and Logback can be done by adding two dependencies, or just `logback-classic` that points to both libraries (incidentally they are from the same author):
+我们还建议使用 https://logback.qos.ch/[Logback] 作为记录器实现。 集成SLF4J和Logback可以通过添加两个依赖关系来完成，或者只是指向两个库的 `logback-classic`（碰巧的是他们来自同一作者）：
 
 [source,xml,indent=0]
 ----
