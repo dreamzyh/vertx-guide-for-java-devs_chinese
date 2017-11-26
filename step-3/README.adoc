@@ -1,15 +1,12 @@
-= Refactoring to Vert.x services
+= 重构Vert.x服务
 
-TIP: The corresponding source code is in the `step-3` folder of the guide repository.
+TIP: 相应的源代码位于指南存储库的step-3文件夹中。
 
-The previous refactoring was a big step forward compared to our initial implementation, as we extracted independent and configurable verticles connected using asynchronous messages on the event bus.
-We also saw that we could deploy several instances of a given verticle to better cope with load and to better leverage CPU cores.
+与我们最初的实现相比，以前的重构是向前迈出的一大步，因为我们提取了在事件总线上使用异步消息连接的独立和可配置的Verticle。 我们还看到，我们可以部署给定Verticle的多个实例，以更好地应对负载并更好地利用CPU内核。
 
-In this section we see how to design and use Vert.x services.
-The main advantage of a service is that it defines an interface for doing certain operations that a verticle exposes.
-We also leverage code generation for all the event bus messaging plumbing, instead of crafting it ourselves like we did in the previous section.
+在本节中，我们看到如何设计和使用Vert.x服务。 服务的主要优点是定义了一个接口，用于执行Verticle公开的某些操作。 我们还将代码生成功能用于所有事件总线消息管理，而不是像上一节中那样自己制作代码。
 
-We are also going to refactor the code into different Java packages:
+我们也将把代码重构成不同的Java包：
 
 ----
 step-3/src/main/java/
@@ -29,133 +26,128 @@ step-3/src/main/java/
                     └── HttpServerVerticle.java
 ----
 
-`io.vertx.guides.wiki` will now contain the main verticle, `io.vertx.guides.wiki.database` the database verticle and service, and `io.vertx.guides.wiki.http` the HTTP server verticle.
+`io.vertx.guides.wiki` 现在将包含主verticle, `io.vertx.guides.wiki.database` 数据库verticle和服务,以及 `io.vertx.guides.wiki.http` 的HTTP服务器verticle。
 
-== Maven configuration changes
+== Maven配置更改
 
-First, we need to add the following 2 dependencies to our project.
-Obviously we need the `vertx-service-proxy` APIs:
+首先，我们需要添加以下2个依赖项到我们的项目中。 显然，我们需要 `vertx-service-proxy` API：
 
 [source,xml,indent=0]
 ----
 include::pom.xml[tags=service-proxy-dep]
 ----
 
-We need the Vert.x code generation module as a compilation-time only dependency (hence the `provided` scope):
+我们需要Vert.x代码生成模块作为仅编译时依赖项（以此提供的范围）：
 
 [source,xml,indent=0]
 ----
 include::pom.xml[tags=codegen-dep]
 ----
 
-Next we have to tweak the `maven-compiler-plugin` configuration to use code generation, which is done via a `javac` annotation processor:
-
+接下来，我们必须调整 `maven-compiler-plugin` 配置以使用通过 `javac` 注释处理器完成的代码生成：
 [source,xml,indent=0]
 ----
 include::pom.xml[tags=codegen]
 ----
 
-Note that the generated code is put in `src/main/generated`, which some integrated development environments like IntelliJ IDEA will automatically pick up on the classpath.
+请注意，生成的代码放在 `src/main/generated` 中，一些像IntelliJ IDEA这样的集成开发环境会自动在类路径中选取。
 
-It is also a good idea to update the `maven-clean-plugin` to remove those generated files:
+更新 `maven-clean-plugin` 以删除那些生成的文件也是一个好主意：
 
 [source,xml,indent=0]
 ----
 include::pom.xml[tags=clean]
 ----
 
-TIP: The full documentation on Vert.x services is available at http://vertx.io/docs/vertx-service-proxy/java/
+TIP: 有关Vert.x服务的完整文档，请访问 http://vertx.io/docs/vertx-service-proxy/java/
 
-== Database service interface
+== 数据库服务接口
 
-Defining a service interface is as simple as defining a Java interface, except that there are certain rules to respect for code generation to work and also to ensure inter-operability with other code in Vert.x.
+定义一个服务接口就像定义一个Java接口一样简单，除了有一定的规则要遵守代码生成工作，还要确保与Vert.x中的其他代码的互操作性。
 
-The beginning of the interface definition is:
+接口定义的开始是：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/database/WikiDatabaseService.java[tags=interface]
 ----
 
-1. The `ProxyGen` annotation is used to trigger the code generation of a proxy for clients of that service.
-2. The `Fluent` annotation is optional, but allows _fluent_ interfaces where operations can be chained by returning the service instance. This is mostly useful for the code generator when the service shall be consumed from other JVM languages.
-3. Parameter types need to be strings, Java primitive types, JSON objects or arrays, any enumeration type or a `java.util` collection (`List` / `Set` / `Map`) of the previous types. The only way to support arbitrary Java classes is to have them as Vert.x data objects, annotated with `@DataObject`. The last opportunity to pass other types is service reference types.
-4. Since services provide asynchronous results, the last argument of a service method needs to be a `Handler<AsyncResult<T>>` where `T` is any of the types suitable for code generation as described above.
+1. `ProxyGen` 注释用于触发该服务的客户端的代理生成代码。
+2. `Fluent` 注解是可选的，但允许通过返回服务实例链接操作的 _fluent_ 接口。当服务从其他JVM语言中消耗时，这对于代码生成器是非常有用的。
+3. 参数类型需要是字符串，Java基本类型，JSON对象或数组，任何枚举类型或以前类型的 `java.util` 集合(`List` / `Set` / `Map`)。支持任意Java类的唯一方法是将它们作为Vert.x数据对象，用@DataObject注释。传递其他类型的最后选择是服务引用类型。
+4. 由于服务提供异步结果，所以服务方法的最后一个参数需要是一个 `Handler<AsyncResult<T>>` ，其中T是适用于上述代码生成的任何类型。
 
-It is a good practice that service interfaces provide static methods to create instances of both the actual service implementation and proxy for client code over the event bus.
+服务接口提供静态方法来创建事件总线上的客户端代码的实际服务实现和代理实例，这是一个很好的做法。
 
-We define `create` as simply delegating to the implementation class and its constructor:
+我们将 `create` 定义为简单地委托实现类及其构造函数：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/database/WikiDatabaseService.java[tags=create]
 ----
 
-The Vert.x code generator creates the proxy class and names it by suffixing with `VertxEBProxy`.
-Constructors of these proxy classes need a reference to the Vert.x context as well as a destination address on the event bus:
+Vert.x代码生成器创建代理类，并使用 `VertxEBProxy` 作为后缀进行命名。这些代理类的构造函数需要对Vert.x上下文的引用以及事件总线上的目标地址：T
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/database/WikiDatabaseService.java[tags=proxy]
 ----
 
-NOTE: The `SqlQuery` and `ErrorCodes` enumeration types that were inner classes in the previous iteration have been extracted to package-protected types, see `SqlQuery.java` and `ErrorCodes.java`.
+NOTE: 上一次迭代中的内部类的 `SqlQuery` 和 `ErrorCodes` 枚举类型已被提取为包保护类型，请参阅 `SqlQuery.java` 和 `ErrorCodes.java` 。
 
-== Database service implementation
+== 数据库服务实现
 
-The service implementation is a straightforward port of the previous `WikiDatabaseVerticle` class code.
+服务实现是以前的 `WikiDatabaseVerticle` 类代码的一个直接的端口。本质的区别是在构造函数（报告初始化结果）和服务方法（报告操作成功）中支持异步结果处理程序。The service implementation is a straightforward port of the previous `WikiDatabaseVerticle` class code.
 The essential difference is the support of the asynchronous result handler in the constructor (to report the initialization outcome) and in the service methods (to report the operation success).
 
-The class code is the following:
+类代码如下：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/database/WikiDatabaseServiceImpl.java[tags=implementation]
 ----
 
-There is one last step required before the proxy code generation works: the service package needs to have a `package-info.java` annotated to define a Vert.x module:
+代理代码生成工作前需要做最后一步：服务包需要有一个 `package-info.java` 注释来定义一个Vert.x模块：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/database/package-info.java[tags=module]
 ----
 
-== Exposing the database service from the database verticle
+== 公开数据库Verticle中的数据库服务
 
-As most of the database handling code has been moved to `WikiDatabaseServiceImpl`, the `WikiDatabaseVerticle` class now consists of 2 methods: the `start` method to register the service and a utility method to load SQL queries:
+由于大部分数据库处理代码已被移至 `WikiDatabaseServiceImpl` ，因此 `WikiDatabaseVerticle` 类现在由两个方法组成：注册服务的 `start` 方法和加载SQL查询的实用程序方法：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/database/WikiDatabaseVerticle.java[tags=dbverticle]
 ----
-<1> We register the service here.
+<1> 我们在这里注册服务。
 
-Registering a service requires an interface class, a Vert.x context, an implementation and an event bus destination.
+注册服务需要接口类，Vert.x上下文，实现和事件总线目的地。
 
-The `WikiDatabaseServiceVertxEBProxy` generated class handles receiving messages on the event bus and then dispatching them to the `WikiDatabaseServiceImpl`.
-What it does is actually very close to what we did in the previous section: messages are being sent with a `action` header to specify which method to invoke, and parameters are encoded in JSON.
+`WikiDatabaseServiceVertxEBProxy` 生成的类处理在事件总线上接收消息，然后将它们分派到 `WikiDatabaseServiceImpl`。它的作用实际上与我们在上一节中所做的非常接近：消息正在使用  `action` 头部发送，以指定要调用的方法，参数使用JSON进行编码。
 
-== Obtaining a database service proxy
+== 获取数据库服务代理
 
-The final steps to refactoring to Vert.x services is to adapt the HTTP server verticle to obtain a proxy to the database service
-and use it in the handlers instead of the event bus.
+重构Vert.x服务的最后一步是调整HTTP服务器Verticle以获取数据库服务的代理，并将其用于处理程序而不是事件总线。
 
-First, we need to create the proxy when the verticle starts:
+首先，我们需要在Verticle启动时创建代理：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=db-consume]
 ----
 
-<1> We just need to make sure to use the same event bus destination as the service that was published by  `WikiDatabaseVerticle`.
+<1> 我们只需要确保使用与 `WikiDatabaseVerticle` 发布的服务相同的事件总线目的地。
 
-Then, we need to replace calls to the event bus with calls to the database service:
+然后，我们需要用对数据库服务的调用来替换对事件总线的调用：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=db-service-calls]
 ----
 
-The `WikiDatabaseServiceVertxProxyHandler` generated class deals with forwarding calls as event bus messages.
+`WikiDatabaseServiceVertxProxyHandler` 生成的类将对转发呼叫作为事件总线消息进行处理。
 
-TIP: It is still perfectly possible to consume a Vert.x service directly via event bus messages since this is what generated proxys do.
+TIP: 直接通过事件总线消息直接使用Vert.x服务仍然是完全可能的，因为这是Proxy生成的。
