@@ -19,11 +19,11 @@ GitHub公开了一个用于获取，创建，更新和删除Gist的 https://deve
 
 image::images/backup-button.png[]
 
-Clicking the _backup_ button will trigger the creating of a Gist:
+点击备份按钮将触发创建一个Gist:
 
 image::images/gist-created.png[]
 
-A backup Gist consists of 1 file per wiki page, with the content being the raw Markdown text:
+一个备份Gist包含每个wiki页面的1个文件，内容为原始Markdown文本:
 
 image::images/gist.png[]
 
