@@ -27,34 +27,31 @@ image::images/gist-created.png[]
 
 image::images/gist.png[]
 
-== Updating the database service
+== 更新数据库服务
 
-Before we dive into the web client API and perform HTTP requests to another service, we need to update the database service API to fetch all the wiki pages data in one pass.
-This corresponds to the following SQL query to add to `db-queries.properties`:
+在我们深入Web客户端API并执行对其他服务的HTTP请求之前，我们需要更新数据库服务API可以让其一次获取所有wiki页面数据。 这对应于以下SQL查询以添加到 `db-queries.properties`:
 
     all-pages-data=select * from Pages
 
-A new method is added to the `WikiDatabaseService` interface:
+一个新的方法被添加到 `WikiDatabaseService` 接口中:
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/database/WikiDatabaseService.java[tags=fetchAllPagesData]
 ----
 
-The implementation in `WikiDatabaseServiceImpl` is the following:
+`WikiDatabaseServiceImpl` 中的实现如下:
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/database/WikiDatabaseServiceImpl.java[tags=fetchAllPagesData]
 ----
 
-== The web client API
+== Web客户端API
 
-The Vert.x core library offers a `createHttpClient` method from the `vertx` context object.
-Instances of `io.vertx.core.http.HttpClient` provides low-level methods for doing all kinds of HTTP requests with a fine-grained control over the protocol and the stream of events.
+Vert.x核心库从 `vertx` 上下文对象提供了一个 `createHttpClient` 方法。`io.vertx.core.http.HttpClient` 的实例为执行各种HTTP请求提供了低级别的方法，并对协议和事件流进行了细粒度的控制。
 
-The web client API provides a simpler facade, especially for simplifying the payload data (un)marshaling.
-This API comes in the form of a new dependency:
+Web客户端API提供了更简洁的外观，特别是用于简化有效负载数据(非)封送处理。 该API以新的依赖关系的形式出现：
 
 [source,xml]
 ----
@@ -65,8 +62,7 @@ This API comes in the form of a new dependency:
 </dependency>
 ----
 
-The following is a sample usage from a unit test.
-The test starts a HTTP server and then it does a HTTP GET request with the web client API to check that the request to the server succeeded:
+以下是单元测试的示例用法。 测试启动一个HTTP服务器，然后它使用Web客户端API执行HTTP GET请求，以检查对服务器的请求是否成功：
 
 [source,java,indent=0]
 ----
