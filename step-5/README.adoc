@@ -1,15 +1,15 @@
-= Integrating with a 3rd-party web service
+= 与第三方Web服务集成
 
-TIP: The corresponding source code is in the `step-5` folder of the guide repository.
+TIP: 相应的源代码位于指南存储库的step-5文件夹中。
 
-Modern applications rarely live on a separated island as they need to integrate with other (distributed) application and services.
-Integration is very often achieved using APIs exposed over the versatile HTTP protocol.
+现代应用程序很少像孤岛一样独立的，因为它们需要与其他(分布式)应用程序和服务集成。 
+通常使用通过HTTP协议公开的API来实现集成。
 
-This section shows how to integrate with a 3rd-party web service using the HTTP client APIs of Vert.x.
+本节介绍如何使用Vert.x的HTTP客户端API与第三方Web服务进行集成。
 
-== Scenario: backing up to GitHub Gist
+== 场景：备份到GitHub Gist
 
-The https://gist.github.com/[GitHub Gist service] is popular for sharing code snippets to the world.
+https://gist.github.com/[GitHub Gist服务]非常受欢迎，可将代码片段分享给全世界。 其他服务可以使用它，例如https://medium.com[Medium发布平台]，其中指向Gist的链接允许将代码片段嵌入到发布中。The https://gist.github.com/[GitHub Gist service] is popular for sharing code snippets to the world.
 Other services can use it, an example being the https://medium.com[Medium publishing platform] where links to Gists allow code snippets to be embedded inside publications.
 
 GitHub exposes a https://developer.github.com/v3/[detailed API] for fetching, creating, updating and deleting Gists.
