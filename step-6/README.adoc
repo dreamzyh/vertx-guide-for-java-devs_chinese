@@ -1,16 +1,15 @@
-= Exposing a web API
+= 发布一个web API
 
-TIP: The corresponding source code is in the `step-6` folder of the guide repository.
+TIP: 相应的源代码位于指南存储库的 `step-6` 文件夹中。
 
-Exposing a web HTTP/JSON API is very straightforward using what we have already covered from the `vertx-web` module.
-We are going to expose a web API with the following URL scheme:
+使用我们已经从 `vertx-web` 模块中已经介绍的内容，发布一个Web HTTP/JSON API非常简单。 我们将使用以下URL方案发布一个Web API：
 
-* `GET /api/pages` gives a document will all wiki page names and identifiers,
-* `POST /api/pages` creates a new wiki page from a document,
-* `PUT /api/pages/:id` updates a wiki page from a document,
-* `DELETE /api/pages/:id` deletes a wiki page.
+* `GET /api/pages` 给出所有的wiki页面名称和标识符的信息,
+* `POST /api/pages` 创建一个新的wiki页面，
+* `PUT /api/pages/:id` 更新一个wiki页面，
+* `DELETE /api/pages/:id` 删除一个wiki页面。
 
-Here is a screenshot of interacting with the API using the https://httpie.org/[HTTPie command-line tool]:
+以下是使用 https://httpie.org/[HTTPie命令行工具] 与API进行交互的屏幕截图：
 
 image::images/webapi-httpie.png[]
 
