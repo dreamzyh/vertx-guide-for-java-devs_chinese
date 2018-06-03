@@ -95,10 +95,10 @@ router.get("/backup").handler(this::backupHandler);
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=backupHandler]
 ----
-<1> The Gist creation request payload is a JSON document as outlined in the https://developer.github.com/v3/gists/#create-a-gist[GitHub API documentation].
-<2> Each file is an entry under the `files` object of the payload, where the title is the key and the value is the text.
-<3> The web client needs to issue a `POST` request on port 443 (HTTPS), and the path must be `/gists`.
-<4> It is mandatory to have a `Accept` header in the request with the `application/vnd.github.v3+json` MIME type, otherwise the request fails. It is also important to specify that the payload is a JSON object at the next line.
-<5> The `BodyCodec` class provides a helper to specify that the response will be directly converted to a Vert.x `JsonObject` instance. It is also possible to use `BodyCodec#json(Class<T>)` and the JSON data will be mapped to a Java object of type `T` (this uses Jackson data mapping under the hood).
-<6> `sendJsonObject` is a helper for triggering the HTTP request with a JSON payload.
-<7> Upon success we can traverse the JSON data (`html_url` key) to get the user-friendly URL of the newly created Gist.
+<1> Gist创建请求负载是 https://developer.github.com/v3/gists/#create-a-gist[GitHub API文档] 中概述的JSON。
+<2> 每个文件都是有效负载的 `files` 对象下的条目，其中标题是键，值是文本。
+<3> Web客户端需要在443端口(HTTPS)上发出 `POST` 请求，路径必须是 `/gists`。
+<4> 必须在请求中有包含 `application/vnd.github.v3+json` MIME类型的 `Accept` 头，否则请求将失败。指定有效负载是下一行中的JSON对象也很重要。
+<5> `BodyCodec` 类提供了一个帮助器来指定响应将直接转换为Vert.x `JsonObject` 实例。也可以使用 `BodyCodec#json(Class<T>)` ，并将JSON数据映射到 `T` 类型的Java对象(这使用Jackson数据映射)。
+<6> `sendJsonObject` 是用JSON负载触发HTTP请求的帮助器。
+<7> 一旦成功，我们可以遍历JSON数据(`html_url` 键)以获取新创建的Gist的用户友好URL。
