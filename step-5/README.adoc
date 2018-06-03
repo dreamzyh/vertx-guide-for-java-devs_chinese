@@ -9,7 +9,7 @@ TIP: 相应的源代码位于指南存储库的step-5文件夹中。
 
 == 场景：备份到GitHub Gist
 
-https://gist.github.com/[GitHub Gist服务]非常受欢迎，可将代码片段分享给全世界。 其他服务可以使用它，例如https://medium.com[Medium发布平台]，其中指向Gist的链接允许将代码片段嵌入到发布中。The https://gist.github.com/[GitHub Gist service] is popular for sharing code snippets to the world.
+https://gist.github.com/[GitHub Gist服务]非常受欢迎，可将代码片段分享给全世界。 其他服务可以使用它，例如 https://medium.com[Medium发布平台]，其中指向Gist的链接允许将代码片段嵌入到发布中。The https://gist.github.com/[GitHub Gist service] is popular for sharing code snippets to the world.
 Other services can use it, an example being the https://medium.com[Medium publishing platform] where links to Gists allow code snippets to be embedded inside publications.
 
 GitHub exposes a https://developer.github.com/v3/[detailed API] for fetching, creating, updating and deleting Gists.
