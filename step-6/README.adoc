@@ -4,7 +4,7 @@ TIP: 相应的源代码位于指南存储库的 `step-6` 文件夹中。
 
 使用我们已经从 `vertx-web` 模块中已经介绍的内容，发布一个Web HTTP/JSON API非常简单。 我们将使用以下URL方案发布一个Web API：
 
-* `GET /api/pages` 给出所有的wiki页面名称和标识符的信息,
+* `GET /api/pages` 获取一个文档，其包含所有的wiki页面名称和标识符的信息,
 * `POST /api/pages` 创建一个新的wiki页面，
 * `PUT /api/pages/:id` 更新一个wiki页面，
 * `DELETE /api/pages/:id` 删除一个wiki页面。
@@ -39,69 +39,65 @@ include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=ap
 <2> 生成的JSON数组成为响应有效负载中的 `pages` 键的值。
 <3> `JsonObject#encode()` 为JSON数据提供了紧凑的 `String` 表示形式。
 
-=== Getting a page
+=== 获取一个页面
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=apiGetPage]
 ----
 
-=== Creating a page
+=== 创建一个页面
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=apiCreatePage]
 ----
 
-This handler and other handlers need to deal with incoming JSON documents.
-The following `validateJsonPageDocument` method is a helper for doing validation and early error reporting, so that the remainder of the processing assume the presence of certain JSON entries:
+这个处理器和其他处理器需要处理传入的JSON数据。 以下 `validateJsonPageDocument` 方法是用于执行验证和早期错误报告的帮助器，以便处理的其余部分假定存在某些JSON条目：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=validateJsonPageDocument]
 ----
 
-=== Updating a page
+=== 更新一个页面
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=apiUpdatePage]
 ----
 
-The `handleSimpleDbReply` method is a helper for finishing the request processing:
+ `handleSimpleDbReply` 方法是完成请求处理的帮助器：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=handleSimpleDbReply]
 ----
 
-=== Deleting a page
+=== 删除一个页面
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=apiDeletePage]
 ----
 
-== Unit testing the API
+== 单元测试API
 
-We write a basic test case in the `io.vertx.guides.wiki.http.ApiTest` class.
+我们在 `io.vertx.guides.wiki.http.ApiTest` 类中编写了一个基本的测试用例。
 
-The preamble consists in preparing the test environment.
-The HTTP server verticle needs the database verticle to be running, so we need to deploy both in our test Vert.x context:
+序言中包括准备测试环境。HTTP服务器Verticle需要运行数据库Verticle，所以我们需要在我们测试的Vert.x上下文中部署其两个：
 
 [source,java,indent=0]
 ----
 include::src/test/java/io/vertx/guides/wiki/http/ApiTest.java[tags=preamble]
 ----
-<1> We use a different JDBC URL to use an in-memory database for the tests.
+<1> 我们使用不同的JDBC URL来为测试使用内存数据库。
 
-The proper test case is a simple scenario where all types of requests are being made.
-It creates a page, fetches it, updates it then deletes it:
+正确的测试用例是一个简单的场景，其中包含所有类型的请求。 它创建一个页面，获取它，更新它然后删除它：
 
 [source,java,indent=0]
 ----
 include::src/test/java/io/vertx/guides/wiki/http/ApiTest.java[tags=play-with-api]
 ----
 
-TIP: The test uses `Future` objects composition rather than nested callbacks; the last composition must complete the
-async future or the test will eventually time out.
+TIP: 测试使用 `Future` 对象组合而不是嵌套回调; 最后的组合必须完成异步的future或者测试最终会超时。
