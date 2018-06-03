@@ -69,28 +69,27 @@ Web客户端API提供了更简洁的外观，特别是用于简化有效负载�
 include::src/test/java/io/vertx/guides/wiki/http/SampleHttpServerTest.java[tags=client]
 ----
 
-== Creating anonymous Gists
+== 创建匿名Gists
 
-We first need a web client object to issue HTTP requests to the Gist API:
+我们首先需要一个Web客户端对象来发出对Gist API的HTTP请求:
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=webClient]
 ----
 
-TIP: Since requests are made using HTTPS, we need to configure the web client with SSL support.
+TIP: 由于请求是使用HTTPS完成的，因此我们需要使用SSL支持来配置Web客户端。
 
-TIP: The GitHub API requires a valid `User-Agent` header and requests a GitHub account or organization identifier.
-We override the default user agent with `vert-x3` but you may opt to use your own value instead.
+TIP: GitHub API需要有效的 `User-Agent` 并请求GitHub帐户或开发组织标识。我们用 `vert-x3` 覆盖默认的User-Agent，但是你可以使用自己制定的值来代替。
 
-We then modify the web router configuration in the `HttpServerVerticle` class to add a new route for triggering backups:
+然后，我们修改 `HttpServerVerticle` 类中的Web路由器配置来添加一条用于触发备份的新路由：
 
 [source,java]
 ----
 router.get("/backup").handler(this::backupHandler);
 ----
 
-The code for this handler is the following:
+这个处理程序的代码如下：
 
 [source,java,indent=0]
 ----
