@@ -1,13 +1,12 @@
-= Securing and controlling access
+= 安全和控制访问
 
-TIP: The corresponding source code is in the `step-7` folder of the guide repository.
+TIP: 	相应的源代码位于指南存储库的 `step-7` 文件夹中。
 
-Securing and controlling access is easy to do with Vert.x.
-In this section, we will:
+安全和控制访问对于Vert.x来说很容易。 在本节中，我们将：
 
-1. move from HTTP to HTTPS, and
-2. add user authentication with group-based privileges to the web application, and
-3. control access to the web API using https://jwt.io/[_JSON web tokens_ (JWT)].
+1. 从HTTP转移到HTTPS，
+2. 使用基于组的权限将用户身份验证添加到Web应用程序，
+3. 使用 https://jwt.io/[_JSON web 令牌_ (JWT)]  对Web API进行控制访问。
 
 == HTTPS support in Vert.x
 
