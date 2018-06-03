@@ -13,33 +13,31 @@ TIP: 相应的源代码位于指南存储库的 `step-6` 文件夹中。
 
 image::images/webapi-httpie.png[]
 
-== Web sub-routers
+== Web子路由器
 
-We are going to add new route handlers to the `HttpServerVerticle`.
-While we could just add handlers to the existing router, we can also take advantage of _sub-routers_.
-They allow a router to be mounted as a sub-router of another one, which can be useful for organizing and/or re-using handlers.
+我们将添加新的路由处理器到 `HttpServerVerticle`。虽然我们可以将处理器添加到现有路由器，但我们也可以利用 _子路由器_ 。它们允许路由器作为另一个路由器的子路由器进行安装，这对组织或重新使用处理器非常有用。
 
-Here is the code for the API router:
+以下是API路由器的代码：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=apiRouter]
 ----
-<1> This is where we mount our router, so requests starting with the `/api` path will be directed to `apiRouter`.
+<1> 这是我们安装路由器的地方，所以以 `/api` 路径开始的请求将被定向到 `apiRouter` 。
 
-== Handlers
+== 处理器
 
-Here is the code for the different API router handlers.
+以下是不同API路由器处理器的代码。
 
-=== Root resource
+=== 根资源
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=apiRoot]
 ----
-<1> We just remap database results in page information entry objects.
-<2> The resulting JSON array becomes the value for the `pages` key in the response payload.
-<3> `JsonObject#encode()` gives a compact `String` representation of the JSON data.
+<1> 我们只是在页面信息条目对象中重新映射数据库结果。
+<2> 生成的JSON数组成为响应有效负载中的 `pages` 键的值。
+<3> `JsonObject#encode()` 为JSON数据提供了紧凑的 `String` 表示形式。
 
 === Getting a page
 
