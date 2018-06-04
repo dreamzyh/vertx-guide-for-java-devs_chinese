@@ -1,90 +1,77 @@
-= Real-time web features using cross-border messaging over the event bus
+= 在事件总线上使用跨边界消息传递的实时web功能
 
-TIP: The corresponding source code is in the `step-10` folder of the guide repository.
+TIP: 相应的源代码位于指南存储库的 `step-10` 文件夹中。
 
-Earlier in this guide we saw the event bus in action for verticles to communicate using message-passing inside Vert.x applications.
-The developer only has to register a consumer to receive messages and sending / publishing messages.
+在本指南的较早部分，我们看到事件总线正在使用Vert.x应用程序中的消息传递进行通信。开发人员只需注册消费者即可接收消息并发送/发布消息。
 
-The SockJS event bus bridge extends these capabilities to the client-side, in the web browser.
-It creates a distributed event bus which not only spans multiple Vert.x instances in a cluster, but also includes client-side JavaScript running in (many) browsers.
-We can therefore create a huge distributed event bus encompassing many browsers and servers, resulting in a consistent message-based programming model across all constituents of a distributed application.
+SockJS事件总线桥将这些功能在Web浏览器中扩展到客户端。它创建了一个分布式事件总线，它不仅跨越集群中的多个Vert.x实例，还包括在(许多)浏览器中运行的客户端JavaScript。因此，我们可以创建包含许多浏览器和服务器的大型分布式事件总线，从而在分布式应用程序的所有组成部分中建立一致的基于消息的编程模型。
 
-In this chapter, we will modify the code from `step-9` so that:
+在本章中，我们将修改 `step-9` 中的代码，以便：
 
-* the Markdown content to be rendered is sent to the server without creating new HTTP requests, and
-* the page shows a warning when a user is editing a page which has just been modified by another user.
+* 要呈现的Markdown内容将被发送到服务器，而不会创建新的HTTP请求
+* 当用户编辑刚刚被其他用户修改的页面时, 该页显示一个警告。
 
-== Setting up the SockJS event bus bridge
+== 设置SockJS事件总线桥
 
-=== On the server
+=== 在服务器上
 
 [NOTE]
 ====
-SockJS is a client-side JavaScript library and protocol that provides a simple WebSocket-like interface for making connections to SockJS servers, irrespective of whether the actual browser or network will allow real WebSockets.
-It does this by supporting various different transports between browser and server, and choosing one at runtime according to their capabilities.
+SockJS是一个客户端JavaScript库和协议，它提供了一个简单的类似WebSocket的接口，用于连接到SockJS服务器，而不管实际的浏览器或网络是否允许真正的WebSocket。它通过在浏览器和服务器之间支持各种不同的传输，并根据其功能在运行时选择一个来实现。
 ====
 
-As a first step, we need to setup the `SockJSHandler` that is provided by the `vertx-web` project:
+作为第一步，我们需要设置由 `vertx-web` 项目提供的 `SockJSHandler` ：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=sockjs-handler-setup]
 ----
-<1> Create a new `SockJSHandler` for this `vertx` instance.
-<2> Allow delivery of messages coming from the browser on the `app.markdown` address.
-We will use this address to get the server process the Markdown content as we edit a wiki page.
-<3> Allow sending messages going to the browser on the `page.saved` address.
-We will use this address to notify browsers that a wiki page has been modified.
-<4> Configure the handler to bridge SockJS traffic to the event bus.
-<5> Handle all requests under the `/eventbus` path with the SockJS handler.
+<1> 为此 `vertx` 实例创建一个新的 `SockJSHandler` 。
+<2> 允许从 `app.markdown` 地址传递来自浏览器的消息。在编辑wiki页面时，我们将使用此地址让服务器处理Markdown内容。
+<3> 允许将消息发送到 `page.saved` 地址上的浏览器。我们将使用此地址通知浏览器Wiki页面已被修改。
+<4> 配置处理器以将SockJS流量桥接到事件总线。Configure the handler to bridge SockJS traffic to the event bus.
+<5> 使用SockJS处理器处理 `/eventbus` 路径下的所有请求。
 
 [CAUTION]
 ====
-For most applications you probably do not want client side JavaScript to be able to send just any message to any handler on the server side, or to all other browsers.
-For example:
+对于大多数应用程序，您可能不希望客户端JavaScript能够将任何消息发送到服务器端的任何处理器或所有其他浏览器。例如：
 
-* you may have a service on the event bus that allows data to be accessed or deleted, and clearly we do not want badly behaved or malicious clients to be able to delete all the data in your database,
-* we do not necessarily want any client to be able to listen on any event bus address.
+* 您可能在事件总线上有一项服务，允许访问或删除数据，显然，我们不希望行为恶劣或恶意的客户端能够删除数据库中的所有数据，
+* 我们不一定希望任何客户端能够听取任何事件总线地址。
 
-To deal with this, a SockJS bridge will by default refuse any messages through.
-This is why it is up to you to tell the bridge what messages are ok for it to pass through (as an exception reply messages are always allowed to pass through).
+为了解决这个问题，SockJS桥默认会拒绝任何消息。这就是为什么你要告诉桥什么样的信息可以通过(因为总是允许通过的例外回复信息)。
 ====
 
-=== On the client
+=== 在客户端上
 
-Now that the server is ready to accept messages, we shall configure the client.
+现在服务器已准备好接受消息，我们将配置客户端。
 
-First, the SockJS library and the Vert.x event bus JavaScript client must be loaded.
-The easiest way to get started is to get the files from a public content delivery network:
+首先，必须加载SockJS库和Vert.x事件总线JavaScript客户端。 最简单的入门方法是从公共内容传输网络获取文件：
 
 [source,html,indent=0]
 ----
 include::src/main/resources/webroot/index.html[tags=load-sockjs-eventbus-scripts]
 ----
 
-NOTE: The event bus client can be downloaded beforehand and bundled with the application.
-It is published on `Maven`, `npm`, `bower` and even `webjars` repositories.
+NOTE: 事件总线客户端可以预先下载并与应用程序捆绑在一起。 它发布在 `Maven`, `npm`, `bower`,甚至 `webjars` 仓库中。
 
-Then, we create a new instance of the `EventBus` Javascript object:
+然后，我们创建一个 `EventBus` Javascript对象的新实例：
 
 [source,javascript,indent=0]
 ----
 include::src/main/resources/webroot/wiki.js[tags=event-bus-js-setup]
 ----
 
-== Sending the Markdown content over the event bus for processing
+== 通过事件总线发送Markdown内容进行处理
 
-The SockJS bridge is now up and running.
-In order to process the Markdown content on the server side, we need to register a consumer.
-The consumer handles messages sent to the `app.markdown` address:
+SockJS桥现在正在运行。为了处理服务器端的Markdown内容，我们需要注册一个消费者。消费者处理发送到 `app.markdown` 地址的消息：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=eventbus-markdown-consumer]
 ----
 
-There is nothing new here, we have already been creating event bus consumers before.
-Now let's turn to what happens in the client code:
+这里没有什么新东西，我们之前已经创建了事件总线消费者。现在我们来看看客户端代码中发生了什么：
 
 [source,javascript,indent=0]
 ----
