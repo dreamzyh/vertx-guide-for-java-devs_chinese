@@ -1,67 +1,62 @@
-= Client-side web application using AngularJS 
+= 使用AngularJS的客户端Web应用程序
 
-TIP: The corresponding source code is in the `step-9` folder of the guide repository.
+TIP: 相应的源代码位于指南存储库的 `step-9` 文件夹中。
 
-So far our web interface was using traditional server-side rendering of HTML content.
-Some types of applications can take advantage of client-side rendering to improve user experience by avoiding full page reloads, and approaching the experience of native applications.
+到目前为止，我们的Web界面使用传统的HTML内容服务器端呈现。 某些类型的应用程序可以利用客户端呈现来避免整页重新加载以及接近本机应用程序的体验，从而改善用户体验。
 
-Many popular frameworks exist for that purpose.
-We chose the popular http://angularjs.org/[AngularJS framework] for this guide, but one could equally choose https://facebook.github.io/react/[React], https://vuejs.org/[Vue.js], http://riotjs.com/[Riot] or another framework/library without any loss of generality.
+为此目的存在许多流行的框架。 我们为本指南选择了流行的 http://angularjs.org/[AngularJS framework] 框架，但可以同时选择 https://facebook.github.io/react/[React], https://vuejs.org/[Vue.js], http://riotjs.com/[Riot] 或其他框架/库，而不会失去普遍性。
 
-== Single page application
+== 单页面应用程序
 
-The wiki editing application that we are building allows to select a page, and edit it with the first half of the screen being a HTML preview, and the other half being the Markdown editor:
+我们正在构建的wiki编辑应用程序允许选择一个页面，并将其前半部分作为HTML预览进行编辑，另一半是Markdown编辑器：
 
 image::images/edit-page.png[]
 
-The HTML preview is being rendered by calling a new endpoint in our backend.
-Rendering is triggered when the Markdown editor text changes.
-To avoid overloading the backend with unnecessary requests when the user is busy typing Markdown, a delay is being introduced so as to only trigger the rendering when no change has been made during that delay.
+HTML预览是通过在后端调用一个新端点来呈现的。在Markdown编辑器文本更改时触发渲染。 为了避免在用户忙于输入Markdown时用不必要的请求重载后端，引入了一个延迟，以便只在该延迟期间没有改变时才触发渲染。
 
-The application interface is also dynamic, as new pages make the deletion button disappear:
+应用程序界面也是动态的，因为新页面使删除按钮消失：
 
 image::images/new-page.png[]
 
-== Vert.x Backend
+== Vert.x后端
 
-=== Simplifying the HTTP verticle code
+=== 简化HTTP verticle代码
 
-A client-side application needs a backend that exposes:
+客户端应用程序需要一个后台来发布：
 
-1. the static HTML, CSS and JavaScript content to bootstrap applications in web browsers, and
-2. a web API, typically a HTTP/JSON service.
+1. 静态HTML，CSS和JavaScript内容引导Web浏览器中的应用程序，
+2. 一个Web API，通常是一个HTTP/JSON服务。
 
-We simplified the HTTP verticle implementation to _just_ cover what is needed.
-Starting from the RxJava version from _step #8_, we removed all server-side rendering code as well as the authentication and JWT token issuing code to expose a plain open HTTP/JSON interface.
+我们简化了HTTP Verticle实现，以涵盖所需的内容。 从 _步骤#8_ 的RxJava版本开始，我们移除了所有服务器端渲染代码以及身份验证和JWT令牌发布代码，来发布一个纯开放的HTTP/JSON接口。
 
-Of course building a version that leverages JWT tokens and authentication makes sense for a real-world deployments, but now that we have covered these features we would rather focus on the essential bits in this part of the guide.
+当然，构建一个利用JWT令牌和身份验证的版本对于真实世界的部署很有意义，但现在我们已经介绍了这些功能，我们更愿意将注意力集中在本部分指南的重要部分。
 
-As an example, the `apiUpdatePage` method implementation code is now:
+作为一个例子， `apiUpdatePage` 方法实现代码如下：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=apiUpdatePage]
 ----
 
-=== Exposed routes
+=== 发布的路由
 
-The HTTP/JSON API is exposed through the sames routes as in the previous steps:
+HTTP/JSON API通过与前面步骤相同的路由进行发布：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=routes]
 ----
 
-The front application static assets are being served from `/app`, and we redirect requests to `/` to the `/app/index.html` static file:
+前端应用程序静态资源是从 `/app` 提供的，我们将请求重定向到  `/app/index.html` 静态文件：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=static-assets]
 ----
-<1> Disabling caching is useful in development.
-<2> By default the files are expected to be in the `webroot` package on the _classpath_, so the files shall be placed under `src/main/resources/webroot` in a Maven or Gradle project.
+<1> 禁用缓存在开发中很有用。
+<2> 默认情况下，这些文件应该位于  _classpath_ 的 `webroot` 包中，所以这些文件应该放在 `src/main/resources/webroot` 下的Maven或Gradle项目中。
 
-Last but not least, we anticipate that the application will need the backend to render Markdown to HTML, so we offer a HTTP POST endpoint for this purpose:
+最后但并非最不重要的一点，我们预计应用程序需要后端将Markdown呈现为HTML，因此我们为此提供HTTP POST端点：
 
 [source,java,indent=0]
 ----
