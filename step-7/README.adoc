@@ -153,61 +153,57 @@ include::src/main/resources/templates/index.ftl[]
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=pageDeletionHandler]
 ----
 
-== Authenticating web API requests with JWT
+== 使用JWT验证Web API请求
 
-https://jwt.io/[JSON Web Tokens] (https://tools.ietf.org/html/rfc7519[RFC 7519]) is a standard for issuing JSON-encoded tokens containing _claims_, typically identifying a user and permissions, although claims can be just about anything.
+https://jwt.io/[JSON Web Tokens] (https://tools.ietf.org/html/rfc7519[RFC 7519]) 是发布包含 _声明的_ JSON编码标记的标准，通常标识用户和权限，但声明可以是任何事情。
 
-A token is issued by a server and it is signed with the server key.
-A client can send a token back along with subsequent requests: both the client and the server can check that a token is authentic and unaltered.
+令牌由服务器发出，并使用服务器密钥进行签名。 客户端可以将令牌发送回以及随后的请求：客户端和服务器都可以检查令牌是否真实且未改变。
 
-WARNING: While a JWT token is signed, its content is not encrypted. It must be transported over a secure channel (e.g., HTTPS) and it should never have sensitive data as a claim (e.g., passwords, private API keys, etc).
+WARNING: JWT令牌签名时，其内容未加密。 它必须通过安全通道（例如HTTPS）传输，并且它不应该具有作为声明的敏感数据（例如密码，私人API密钥等）。
 
-=== Adding JWT support
+=== 添加JWT支持
 
-We start by adding the `vertx-auth-jwt` module to the Maven dependencies:
+我们首先将 `vertx-auth-jwt` 模块添加到Maven依赖项中：
 
 [source,xml,indent=0]
 ----
 include::pom.xml[tags=jwt]
 ----
 
-We will have a JCEKS keystore to hold the keys for our tests.
-Here is how to generate a `keystore.jceks` with the suitable keys of various lengths:
+我们将有一个JCEKS密钥库来保存我们测试的密钥。以下是如何使用各种长度的适当键生成 `keystore.jceks` ：
 
 [source,text,indent=0]
 ----
 include::gen-keystore.sh[tags=jwt-keygen]
 ----
 
-We need to install a JWT token handler on API routes:
+我们需要在API路由上安装JWT令牌处理器：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=jwtAuth]
 ----
 
-We pass `/api/token` as a parameter for the `JWTAuthHandler` object creation to specify that this URL shall be ignored.
-Indeed, this URL is being used to generate new JWT tokens:
+我们将 `/api/token` 作为 `JWTAuthHandler` 对象创建的参数传递，以指定该URL将被忽略。 的确，这个URL被用来生成新的JWT令牌：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=issue-jwt]
 ----
-<1> We expect login and password information to have been passed through HTTP request headers, and we authenticate using the Apache Shiro authentication provider of the previous section.
-<2> Upon success we can query for roles.
-<3> We generate a token with `username`, `canCreate`, `canDelete` and `canUpdate` claims.
+<1> 我们预计登录名和密码信息已通过HTTP请求标头传递，我们使用上一节的Apache Shiro身份验证提供程序进行身份验证。
+<2> 一旦成功，我们可以查询角色。
+<3> 我们使用 `username`, `canCreate`, `canDelete` 和 `canUpdate` 声明生成令牌。
 
-Each API handler method can now query the current user principal and claims.
-Here is how the `apiDeletePage` does it:
+每个API处理器方法现在可以查询当前的用户主体和声明。 以下是 `apiDeletePage` 如何做到的：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=apiDeletePage]
 ----
 
-=== Using JWT tokens
+=== 使用JWT令牌
 
-To illustrate how to work with JWT tokens, let's create a new one for the `root` user:
+为了说明如何使用JWT令牌，让我们为 `root` 用户创建一个新的令牌：
 
 ----
 $ http --verbose --verify no GET https://localhost:8080/api/token login:root password:w00t
@@ -230,9 +226,9 @@ Set-Cookie: vertx-web.session=8cbb38ac4ce96737bfe31cc0ceaae2b9; Path=/
 eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJjYW5DcmVhdGUiOnRydWUsImNhbkRlbGV0ZSI6dHJ1ZSwiY2FuVXBkYXRlIjp0cnVlLCJpYXQiOjE0ODk0NDE1OTAsImlzcyI6IlZlcnQueCIsInN1YiI6Ildpa2kgQVBJIn0=.RmtJb81QKVUFreXL-ajZ8ktLGasoKEqG8GSQncRWrN8=
 ----
 
-The response text is the token value and shall be retained.
+响应文本是令牌值并应保留。
 
-We can check that performing an API request without the token results in a denial of access:
+我们可以检查执行不带令牌的API请求会导致拒绝访问：
 
 ----
 $ http --verbose --verify no GET https://localhost:8080/api/pages
@@ -251,8 +247,7 @@ Content-Length: 12
 Unauthorized
 ----
 
-Sending a JWT token along with a request is done using a `Authorization` HTTP request header where the value must be `Bearer <token value>`.
-Here is how to fix the API request above by passing the JWT token that had been issued to us:
+发送JWT令牌和请求一起使用 `授权` HTTP请求头，其中值必须是 `承载<令牌值>` 。 以下是如何通过传递已发布给我们的JWT令牌来修复上面的API请求：
 
 ----
 $ http --verbose --verify no GET https://localhost:8080/api/pages 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJjYW5DcmVhdGUiOnRydWUsImNhbkRlbGV0ZSI6dHJ1ZSwiY2FuVXBkYXRlIjp0cnVlLCJpYXQiOjE0ODk0NDE1OTAsImlzcyI6IlZlcnQueCIsInN1YiI6Ildpa2kgQVBJIn0=.RmtJb81QKVUFreXL-ajZ8ktLGasoKEqG8GSQncRWrN8='
