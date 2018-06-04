@@ -26,7 +26,7 @@ include::gen-keystore.sh[tags=https-keygen]
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=https-server]
 ----
 
-我们可以将浏览器指向 https://localhost:8080/，但由于证书是自签名的，所以任何优秀的浏览器都会正确地产生安全警告：
+我们可以将浏览器指向 https://localhost:8080/ ，但由于证书是自签名的，所以任何优秀的浏览器都会正确地产生安全警告：
 
 image::images/invalid-cert.png[]
 
@@ -79,51 +79,50 @@ include::src/main/resources/wiki-users.properties[tags=props]
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=shiro-auth]
 ----
 
-The `ShiroAuth` object instance is then used to deal with server-side user sessions:
+`ShiroAuth` 对象实例用于处理服务器端用户会话：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=shiro-routes]
 ----
-<1> We install a user session handler for all routes.
-<2> This automatically redirects requests to `/login` when there is no user session for the request.
-<3> We install `authHandler` for all routes where authentication is required.
+<1> 我们为所有路由安装用户会话处理器。
+<2> 当请求没有用户会话时，这会自动将请求重定向到 `/login` 。
+<3> 我们为需要认证的所有路由安装 `authHandler`。
 
-Finally, we need to create 3 routes for displaying a login form, handling login form submissions and logging out users:
+最后，我们需要创建3条路由来显示登录表单，处理登录表单提交和注销用户：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=shiro-login]
 ----
-<1> `FormLoginHandler` is a helper for processing login submission requests. By default it expects the HTTP POST request to have: `username` as the login, `password` as the password, and `return_url` as the URL to redirect to upon success.
-<2> Logging out a user is a simple as clearing it from the current `RoutingContext`.
+<1> `FormLoginHandler` 是处理登录提交请求的帮助器。 默认情况下，它期望HTTP POST请求具有：作为登录名的 `username`，作为密码的 `password` 以及成功时作为重定向URL的 `return_url` 。
+<2> 注销用户很简单，就像从当前的 `RoutingContext` 中清除它一样。
 
-The code for the `loginHandler` method is:
+`loginHandler` 方法的代码是：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=loginHandler]
 ----
 
-The HTML template is placed in `src/main/resources/templates/login.ftl`:
+HTML模板放置在 `src/main/resources/templates/login.ftl`:
 
 [source,html]
 ----
 include::src/main/resources/templates/login.ftl[]
 ----
 
-The login page looks as follows:
+登录页面如下所示：
 
 image::images/login-form.png[]
 
-=== Supporting features based on roles
+=== 支持基于角色的功能
 
-Features need to be activated only if the user has sufficient permissions.
-In the following screenshot an administrator can create a page and perform a backup:
+只有当用户拥有足够的权限时才能激活功能。 在以下屏幕截图中，管理员可以创建一个页面并执行备份：
 
 image::images/as-root.png[]
 
-By contrast a user with no role cannot perform these actions:
+相比之下，没有角色的用户不能执行这些操作：
 
 image::images/as-baz.png[]
 
