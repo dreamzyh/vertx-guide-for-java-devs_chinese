@@ -62,77 +62,71 @@ include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=rx
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=rx-vertx-delegate]
 ----
 
-== Executing authorization queries concurrently
+== 同时执行授权查询
 
-In the previous example, we saw how to use RxJava operators and the Rxified Vert.x API to execute asynchronous operations in order.
-But sometimes this guarantee is not required, or you simply want them to run concurrently for performance reasons.
+在前面的例子中，我们看到了如何使用RxJava操作符和Rxified Vert.x API按顺序执行异步操作。 但有时候这种担保不是必需的，或者您只是希望它们为了性能原因而同时运行。
 
-The JWT token generation process in the `HttpServerVerticle` is a good example of such a situation.
-To create a token, we need all authorization query results to complete, but queries are independent from each other:
+`HttpServerVerticle` 中的JWT令牌生成过程就是这种情况的一个很好的例子。 要创建令牌，我们需要获取所有授权查询结果，但所有查询彼此独立：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=rx-concurrent-composition]
 ----
-<1> Three `Single` objects are created, representing the different authorization queries.
-<2> When the three operations complete successfully, the `zip` operator callback is invoked with the results.
+<1> 创建三个 `Single` 对象，表示不同的授权查询。Three `Single` objects are created, representing the different authorization queries.
+<2> 当三个操作成功完成时，将使用结果调用 `zip` 运算符回调。
 
-== Working with database connections
+== 使用数据库连接
 
-To acquire a database connection from the pool, all you have to do is calling `rxGetConnection` on the `JDBCClient`:
+要从连接池中获取数据库连接，您只需在 `JDBCClient` 上调用 `rxGetConnection` ：
 
 [source,java,indent=0]
 ----
 Single<SQLConnection> connection = dbClient.rxGetConnection();
 ----
 
-The method returns a `Single<Connection>` which you can easily transform with `flatMap` to execute SQL queries:
+该方法返回一个 `Single<Connection>` ，您可以使用 `flatMap` 很容易转换成执行SQL查询：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/database/WikiDatabaseServiceImpl.java[tags=rx-execute-query-with-params]
 ----
 
-But how can we release the connection if the `SQLConnection` reference is no longer reachable?
-A simple and convenient way to do this is to invoke `close` when the `Single<SQLConnection>` is unsubscribed:
+但是如果 `SQLConnection` 引用不再可用，我们如何才能释放连接？ 一个简单而方便的方法是在 `Single<SQLConnection>` 取消订阅时调用 `close` ：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/database/WikiDatabaseServiceImpl.java[tags=rx-get-connection]
 ----
-<1> After the connection is acquired we wrap it into a `Single`
-<2> The `Single` is modified to invoke `close` when unsubscribed
+<1> 在获得连接后，我们将其包装成一个 `Single`
+<2> `Single` 被修改为在退订时调用 `close`
 
-Now we shall use `getConnection` anytime we need to execute SQL queries in our database verticle.
+现在，只要我们需要在数据库Verticle中执行SQL查询，就可以使用 `getConnection` 。
 
-== Bridging the gap between callbacks and RxJava
+== 缩小回调和RxJava之间的差距
 
-At times, you may have to mix your RxJava code with a callback-based API.
-For example, service proxy interfaces can only be defined with callbacks, but the implementation uses the Vert.x Rxified API.
+有时，您可能必须将RxJava代码与基于回调的API混合使用。 例如，服务代理接口只能用回调来定义，但用Vert.x Rxified API来实现。
 
-In this case, the `io.vertx.rx.java.RxHelper` class can adapt a `Handler<AsyncResult<T>>` to an RxJava `Subscriber<T>`:
+在这种情况下， `io.vertx.rx.java.RxHelper` 类可以使 `Handler<AsyncResult<T>>` 适应RxJava的 `Subscriber<T>` ：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/database/WikiDatabaseServiceImpl.java[tags=rxhelper-to-subscriber]
 ----
-<1> `fetchAllPagesData` is an asynchronous service proxy operation, defined with a `Handler<AsyncResult<List<JsonObject>>>` callback.
-<2> The `toSubscriber` method adapts the `resultHandler` to a `Subscriber<List<JsonObject>>`, so that the handler is invoked when the list of rows is emitted.
+<1> `fetchAllPagesData` 是一个异步服务代理操作，使用 `Handler<AsyncResult<List<JsonObject>>>` 回调定义。
+<2> `toSubscriber` 方法将 `resultHandler` 调整为 `Subscriber<List<JsonObject>>` ，以便在发布行列表时调用处理器。
 
-== Data flows
+== 数据流
 
-RxJava is not only great at combining different sources of events, it is also very helpful with data flows.
-Unlike a Vert.x or JDK future, an `Observable` emits a stream of events, not just a single one.
-And it comes with an extensive set of data manipulation operators.
+RxJava不仅善于组合不同的事件源，而且对数据流也非常有帮助。 与Vert.x或JDK future，`Observable` 发出一系列事件，而不仅仅是一个事件。 它配备了大量的数据操作操作符。
 
-We can use a few of them to refactor the `fetchAllPages` database verticle method:
+我们可以使用其中的一些来重构 `fetchAllPages` 数据库verticle方法：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/database/WikiDatabaseServiceImpl.java[tags=rx-data-flow]
 ----
-<1> With `flatMapObservable` we will create an `Observable` from the item emitted by the `Single<Result>`.
-<2> `from` converts the database `results` iterable into an `Observable` emitting the database row items.
-<3> Since we only need the page name we can `map` each `JsonObject` row to the first column.
-<4> The client expects the data to be `sorted` in alphabetical order.
-<5> The event bus service reply consists in a single `JsonArray`. `collect` creates a new one with `JsonArray::new` and later adds items as they are emitted with `JsonArray::add`.
+<1> 使用 `flatMapObservable` ，我们将从 `Single<Result>` 发出的项目创建一个 `Observable` 。
+<2> 从将数据库 `结果` 可迭代转换为发布数据库行项目的 `Observable` 。
+<3> 由于我们只需要页面名称，我们可以将每个 `JsonObject` 行 `映射` 到第一列。
+<4> 客户期望数据按字母顺序排序。
+<5> 事件总线服务应答包含在一个`JsonArray` 中。  `collect` 使用 `JsonArray::new` 创建一个新对象，随后使用 `JsonArray::add` 添加项目。
