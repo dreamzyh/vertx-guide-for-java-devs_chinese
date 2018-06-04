@@ -15,58 +15,47 @@ TIP: 相应的源代码位于指南存储库的 `step-8` 文件夹中。
 include::pom.xml[tags=vertx-rx-java]
 ----
 
-Verticles then have to be modified so that they extend `io.vertx.rxjava.core.AbstractVerticle` instead of `io.vertx.core.AbstractVerticle`.
-How is this different? The former class extends the latter and exposes a `io.vertx.rxjava.core.Vertx` field.
+Verticle必须进行修改，以便扩展 `io.vertx.rxjava.core.AbstractVerticle` 而不是  `io.vertx.core.AbstractVerticle` 。 这有什么不同？ 前一类扩展了后者，并发布了一个 `io.vertx.rxjava.core.Vertx` 字段。
 
-`io.vertx.rxjava.core.Vertx` defines extra `rxSomething(...)` methods that are equivalent to their callback-based counterparts.
+`io.vertx.rxjava.core.Vertx` 定义了额外的 `rxSomething(...)` 方法，这些方法等同于基于回调的对应方法。
 
-Let's take a look at the `MainVerticle` to get a better idea of how it works in practice:
+让我们来看看  `MainVerticle`  以更好地了解它在实践中的工作原理：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=rx-deploy-verticle]
 ----
 
-The `rxDeploy` method does not take a `Handler<AsyncResult<String>>` as final parameter.
-Instead, it returns a `Single<String>`.
+`rxDeploy` 方法不会将 `Handler<AsyncResult<String>>` 作为最终参数。 相反，它返回一个 `Single<String>` 。
 
-Besides, the operation does not start when the method is called.
-It starts when you subscribe to the `Single`.
-When the operation completes, it emits the deployment `id` or signals the cause of the problem with a `Throwable`.
+此外，调用该方法时操作不会启动。 它在您订阅 `Single` 时开始。 操作完成后，它会发出部署 `id` 或用 `Throwable` 指示问题的原因。
 
-== Deploying verticles in order
+== 按顺序部署Verticle
 
-To finalize the `MainVerticle` refactoring, we must make sure the deployment operations get triggered and happen in order:
+为了完成 `MainVerticle` 重构，我们必须确保部署操作被触发并按顺序发生：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/MainVerticle.java[tags=rx-sequential-composition]
 ----
-<1> The `flatMap` operator applies the function to the result of `dbVerticleDeployment`. Here it schedules the deployment of the `HttpServerVerticle`.
-<2> Operations start when subscribing. On success or on error, the `MainVerticle` start future is either completed or failed.
+<1> `flatMap` 运算符将该函数应用于 `dbVerticleDeployment` 的结果。 它在这里安排 `HttpServerVerticle` 的部署。
+<2> 订阅时开始操作。 在成功或出错时，`MainVerticle` 开始 future 将完成或失败。
 
-== Partially _"Rxifying"_ `HttpServerVerticle`
+== 部分 _"Rxifying"_ `HttpServerVerticle`
 
-If you follow the guide in sequence, editing the code as you go, your `HttpServerVerticle` class is still using the
-callback-based API. Before you can use the RxJava API to execute asynchronous operations _naturally_, i.e.
-*_concurrently_*, you need to refactor `HttpServerVerticle`.
+如果按顺序跟随指南，随时编辑代码，则您的 `HttpServerVerticle` 类仍在使用基于回调的API。 在您可以使用RxJava API _自然地_ （即同时）执行异步操作之前，您需要重构 `HttpServerVerticle` 。
 
-=== Import RxJava versions of Vert.x classes
+=== 导入Vert.x类的RxJava版本
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=rx-imports]
 ----
-<1> Our `backupHandler()` method still uses `HttpResponse` class, so it must be imported. It turns out that the RxJava
-version of `HttpResponse` provided by Vert.x can serve as a drop-in replacement in this specific case.
-The _"Rxified"_ code in `step-8` folder of the guide repository does not import this class as the
-response type is inferred by the lambda expression.
+<1> 我们的 `backupHandler()` 方法仍然使用 `HttpResponse` 类，所以它必须被导入。 事实证明，由Vert.x提供的 `HttpResponse` 的RxJava版本可以作为这种特定情况下的直接替换。 指南存储库的 `step-8` 文件夹中的 _"Rxified"_ 代码不会导入此类，因为响应类型是由lambda表达式推断的。
 
-=== Use delegate on a _"Rxified"_ `vertx` instance
+=== 在 _"Rxified"_ `vertx` 实例上使用委托
 
-To call a method expecting a `io.vertx.core.Vertx` instance when you have a `io.vertx.rxjava.core.Vertx` one, call
-the `getDelegate()` method. Verticle's `start()` method needs to be adjusted when creating an instance of
-`WikiDatabaseService`:
+要调用需要 `io.vertx.core.Vertx` 实例的方法(如果有 `io.vertx.rxjava.core.Vertx` 实例)，请调用getDelegate()方法。 在创建 `WikiDatabaseService` 的实例时需要调整Verticle的 `start()` 方法：
 
 [source,java,indent=0]
 ----
