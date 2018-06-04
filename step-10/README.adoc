@@ -77,23 +77,19 @@ include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=ev
 ----
 include::src/main/resources/webroot/wiki.js[tags=eventbus-markdown-sender]
 ----
-<1> The _reply handler_ is a function taking two parameters: an error (if any) and the `reply` object.
-The `reply` object content is nested inside the `body` property.
-<2> Since the event bus client is not managed by AngularJS, `$scope.$apply` wraps the callback to perform proper scope life-cycle.
-<3> As we did when working with `$http`, we invoke `updateRendering` with the HTML result.
+<1> _回复处理器_ 是一个带有两个参数的函数：一个错误(如果有)和 `回复` 对象。 `回复` 对象内容嵌套在 `body` 属性中。
+<2> 由于事件总线客户端不是由AngularJS管理，因此 `$scope.$apply` 包装回调以执行适当的范围生命周期。
+<3> 正如我们在使用 `$http` 时所做的那样，我们使用HTML结果调用 `updateRendering` 。
 
-Admittedly, the code is very similar to its HTTP endpoint equivalent.
-However the benefit here does not lie in the number of lines of code.
+诚然，代码非常类似于它的HTTP端点。然而，这里的好处并不在于代码行数。
 
-Indeed, if you communicate with the server over the event bus, the bridge transparently distributes incoming messages among registered consumers.
-Consequently, when Vert.x runs in cluster mode, the browser is not tied to a single server for processing (apart from the SockJS connection).
-What's more the connection to the server is never closed, so with HTTP/1.1 this saves establishing a TCP connection for each request, which may be useful if you have lots of exchanges between servers and clients.
+事实上，如果您通过事件总线与服务器进行通信，桥接器会在注册用户之间透明地分发传入消息。因此，当Vert.x以集群模式运行时，浏览器不会连接到单个服务器进行处理(除了SockJS连接)。更重要的是与服务器的连接永远不会关闭，所以使用HTTP/1.1可以节省为每个请求建立TCP连接，如果服务器和客户端之间有很多交换，这可能会很有用。
 
-== Warning the user when the page is modified
+== 当页面被修改时警告用户
 
-In many applications, the _last commit wins_ principle is how conflicts are being resolved: when two users edit the same resource at the same time, the last one to press the _save_ button overwrites any previous changes.
+在许多应用程序中， _最后一次提交胜利_ 原则是如何解决冲突：当两个用户同时编辑同一资源时，最后一个按下 _保存_ 按钮将覆盖以前的任何更改。In many applications, the _last commit wins_ principle is how conflicts are being resolved: when two users edit the same resource at the same time, the last one to press the _save_ button overwrites any previous changes.
 
-There are ways around this issue, like entity versioning or extensive literature on the topic of distributed consensus.
+有关这个问题的方法有很多，比如实体版本化或关于分布式共识主题的大量文献。 尽管如此，让我们坚持一个简单的解决方案，看看我们如何通知用户何时做出改变，至少他（她）能够有机会处理这种情况。 只要内容在数据库中被更改，用户就可以决定采取何种最佳措施：覆盖或重新加载。There are ways around this issue, like entity versioning or extensive literature on the topic of distributed consensus.
 Nevertheless, let's stick to a simple solution and see how we can notify the user when a change has been made so that at the very least (s)he can get a chance to deal with the situation.
 As soon as the content has been changed in the database, the user can decide what is the best course of action to take: overwrite or reload.
 
