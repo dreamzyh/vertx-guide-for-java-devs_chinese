@@ -1,6 +1,6 @@
 = Reactive programming with RxJava
 
-TIP: The corresponding source code is in the `step-8` folder of the guide repository.
+TIP: 相应的源代码位于指南存储库的 `step-8` 文件夹中。
 
 So far we have explored various areas of the Vert.x stack, using the callback-based APIs.
 It just works and this programming model is well-known from developers in many languages.
