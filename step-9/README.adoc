@@ -63,60 +63,59 @@ include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=st
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=preview-rendering]
 ----
 
-== AngularJS frontend
+== AngularJS前端
 
-TIP: This guide is not a proper introduction to AngularJS (https://docs.angularjs.org/tutorial[see the official tutorial instead]), we assume some familiarity with the framework from the reader.
+TIP: 本指南不是AngularJS的完整介绍(https://docs.angularjs.org/tutorial[请参阅官方教程])，我们假设读者对框架有一定的了解。This guide is not a proper introduction to AngularJS (https://docs.angularjs.org/tutorial[see the official tutorial instead]), we assume some familiarity with the framework from the reader.
 
-=== Application view
+=== 应用程序视图
 
-The interface fits in a single HTML file located at `src/main/resources/webroot/index.html`.
-The `head` section is:
+该界面适合单个HTML文件，其位于 `src/main/resources/webroot/index.html`.头部是：
 
 [source,html,indent=0]
 ----
 include::src/main/resources/webroot/index.html[tags=head]
 ----
-<1> The AngularJS module is named `wikiApp`.
-<2> `wiki.js` holds the code for our AngularJS module and controller.
+<1> AngularJS模块被命名为 `wikiApp` 。
+<2> `wiki.js` 拥有AngularJS模块和控制器的代码。
 
-As you can see beyond AngularJS we are using the following dependencies from external CDNs:
+正如您在AngularJS之外可以看到的，我们正在使用来自外部CDN的以下依赖项：
 
-* https://getbootstrap.com/[Boostrap] to style our interface,
-* http://fontawesome.io/[Font Awesome] to provide icons,
-* https://lodash.com/[Lodash] to help with some functional idioms in our JavaScript code.
+* https://getbootstrap.com/[Boostrap] 来设计我们的界面，
+* http://fontawesome.io/[Font Awesome] 提供图标，
+* https://lodash.com/[Lodash] 在JavaScript代码中提供一些有用的用语。
 
-Bootstrap requires some further scripts that can be loaded at the end of the document for performance reasons:
+由于性能原因，Bootstrap需要一些可以在文档末尾加载的脚本：
 
 [source,html,indent=0]
 ----
 include::src/main/resources/webroot/index.html[tags=bottom]
 ----
 
-Our AngularJS controller is called `WikiController` and it is bound to a `div` which is also a Bootstrap container:
+我们的AngularJS控制器被称为 `WikiController` ，它被绑定到一个也是Bootstrap容器的 `div` ：
 
 [source,html,indent=0]
 ----
 include::src/main/resources/webroot/index.html[tags=container]
 ----
 
-The buttons on top of the interface consist of the following elements:
+界面顶部的按钮由以下元素组成：
 
 [source,html,indent=0]
 ----
 include::src/main/resources/webroot/index.html[tags=buttons-row]
 ----
-<1> For each wiki page name we generate an element using `ng-repeat` and `ng-click` to define the controller action (`load`) when it is being clicked.
-<2> The refresh button is bound to the `reload` controller action. All other buttons work the same way.
-<3> The `ng-show` directive allows us to show or hide the element depending on the controller `pageExists` method value.
-<4> This `div` is used to display notifications of success or failures.
+<1> 对于每个wiki页面名称，我们使用 `ng-repeat` 和 `ng-click` 来生成一个元素，以在被点击时定义控制器操作(`加载`)。
+<2> 刷新按钮绑定到 `重新加载` 控制器操作。所有其他按钮的工作方式相同。
+<3> `ng-show` 指令允许我们根据控制器的 `pageExists` 方法值显示或隐藏元素。
+<4> `div` 用于显示成功或失败的通知。
 
-The Markdown preview and editor elements are the following:
+Markdown预览和编辑器元素如下：
 
 [source,html,indent=0]
 ----
 include::src/main/resources/webroot/index.html[tags=markdown]
 ----
-<1> `ng-model` binds the `textarea` content to the `pageMarkdown` property of the controller.
+<1> `ng-model` 将 `textarea` 内容绑定到控制器的 `pageMarkdown` 属性上。
 
 === Application controller
 
