@@ -285,32 +285,32 @@ Set-Cookie: vertx-web.session=0598697483371c7f3cb434fbe35f15e4; Path=/
 }
 ----
 
-=== Adapting the API test fixture
+=== 调整API测试工具
 
-The `ApiTest` class needs to be updated to support JWT tokens.
+`ApiTest` 类需要更新以支持JWT令牌。
 
-We add a new field for retrieving the token value to be used in test cases:
+我们添加一个新字段来检索要在测试用例中使用的令牌值：
 
 [source,java,indent=0]
 ----
 include::src/test/java/io/vertx/guides/wiki/http/ApiTest.java[tags=tokenField]
 ----
 
-We add first step to retrieve a JTW token authenticated as user `foo`:
+我们添加第一步来检索经过身份验证的用户 `foo` 的JTW令牌：
 
 [source,java,indent=0]
 ----
 include::src/test/java/io/vertx/guides/wiki/http/ApiTest.java[tags=fetch-token]
 ----
-<1> Credentials are passed as headers.
-<2> The response payload is of `text/plain` type, so we use that for the body decoding codec.
-<3> Upon success we complete the `tokenRequest` future with the token value.
+<1> 凭证作为请求头传递。
+<2> 响应有效负载是 `text/plain` 类型，所以我们将其用于内容解码的解码器。
+<3> 一旦成功，我们用令牌值完成 `tokenRequest` future。
 
-Using the JWT token is now a matter of passing it back as a header to HTTP requests:
+现在使用JWT令牌将其作为头传递给HTTP请求：
 
 [source,java,indent=0]
 ----
 include::src/test/java/io/vertx/guides/wiki/http/ApiTest.java[tags=use-token]
 ----
-<1> We store the token with the `Bearer` prefix to the field for the next requests.
-<2> We pass the token as a header.
+<1> 我们将带有 `Bearer` 前缀的令牌存储到下一个请求的字段中。
+<2> 我们将令牌作为请求头传递。
