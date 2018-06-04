@@ -1,17 +1,14 @@
-= Reactive programming with RxJava
+= 使用RxJava进行响应式编程
 
 TIP: 相应的源代码位于指南存储库的 `step-8` 文件夹中。
 
-So far we have explored various areas of the Vert.x stack, using the callback-based APIs.
-It just works and this programming model is well-known from developers in many languages.
-However, it can become a bit tedious, especially when you combine several sources of events, or deal with complex data flows.
+到目前为止，我们已经使用基于回调的API探索了Vert.x堆栈的各个领域。 它只是能运行，并且这种编程模型在很多编程语言的开发人员中都是众所周知的。 然而，它可能会变得有点乏味，特别是当你结合几个事件源或处理复杂的数据流时。
 
-This is exactly where RxJava shines, and Vert.x integrates with it seamlessly.
+这正是RxJava发挥的作用，Vert.x可以无缝集成它。
 
-== Enabling the RxJava APIs
+== 启用RxJava API
 
-In addition to the callback-based API, the Vert.x modules offer an _"Rxified"_ API.
-To enable it, start by adding the `vertx-rx-java` module to the Maven POM file:
+除了基于回调的API之外，Vert.x模块还提供了 _"Rxified"_ API。 要启用它，首先将 `vertx-rx-java` 模块添加到Maven POM文件中：
 
 [source,xml,indent=0]
 ----
