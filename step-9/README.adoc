@@ -117,65 +117,59 @@ include::src/main/resources/webroot/index.html[tags=markdown]
 ----
 <1> `ng-model` 将 `textarea` 内容绑定到控制器的 `pageMarkdown` 属性上。
 
-=== Application controller
+=== 应用控制器
 
-The `wiki.js` JavaScript starts with an AngularJS module declaration:
+`wiki.js` 以AngularJS模块声明开头：
 
 [source,javascript,indent=0]
 ----
 include::src/main/resources/webroot/wiki.js[tags=module-decl]
 ----
 
-The `wikiApp` module has no plugin dependency, and declares a single `WikiController` controller.
-The controller requires dependency injection of the following objects:
+`wikiApp` 模块没有插件依赖关系，并声明了一个单独的 `WikiController` 控制器。控制器需要依赖注入下列对象：
 
-* `$scope` to provide DOM scoping to the controller, and
-* `$http` to perform asynchronous HTTP requests to the backend, and
-* `$timeout` to trigger actions after a given delay while staying tied to the AngularJS life-cycle (e.g., to ensure that any state modification triggers view changes, which is not the case when using the https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout[classic setTimeout function]).
+* `$scope` 来向控制器提供DOM范围，
+* `$http` 来执行对后端的异步HTTP请求，
+* `$timeout` 在给定的延迟后触发动作，同时保持与AngularJS的生命周期相关联(例如，以确保任何状态修改触发视图更改，而使用 https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout[经典的setTimeout函数] 时情况并非如此)。
 
-Controller methods are being tied to the `$scope` object.
-Let us start with 3 simple methods:
+控制器方法被绑定到 `$scope` 对象。让我们从3个简单的方法开始：
 
 [source,javascript,indent=0]
 ----
 include::src/main/resources/webroot/wiki.js[tags=new-reload-exists]
 ----
 
-Creating a new page consists in initializing controller properties that are attached to the `$scope` object.
-Reloading the pages objects from the backend is a matter of performing a HTTP GET request (note that the `$http` request methods return promises).
-The `pageExists` method is being used to show / hide elements in the interface.
+创建新页面包括初始化连接到 `$scope` 对象的控制器属性。从后端重新加载页面对象需要执行HTTP GET请求(请注意 `$http` 请求方法返回可靠的响应)。 `pageExists` 方法用于显示或隐藏界面中的元素。
 
-Loading the content of the page is also a matter of performing a HTTP GET request, and updating the preview a DOM manipulation:
+加载页面的内容也是执行HTTP GET请求，并更新DOM操作的预览：
 
 [source,javascript,indent=0]
 ----
 include::src/main/resources/webroot/wiki.js[tags=load]
 ----
 
-The next methods support saving / updating and deleting pages.
-For these operations we used the full `then` promise method with the first argument being called on success, and the second one being called on error.
-We also introduce the `success` and `error` helper methods to display notifications (3 seconds on success, 5 seconds on error):
+接下来的方法支持保存，更新和删除页面。对于这些操作，我们使用完整的可靠的方法，第一个参数在成功时调用，第二个在错误时调用。我们还介绍了显示通知的 `成功` 和 `错误` 的帮助器方法(成功3秒，错误5秒)：
 
 [source,javascript,indent=0]
 ----
 include::src/main/resources/webroot/wiki.js[tags=save-delete-notifications]
 ----
 
-initializing the application state and views is done by fetching the pages list, and starting with a blank new page editor:
+通过获取页面列表来初始化应用程序状态和视图，并从空白的新页面编辑器开始：
 
 [source,javascript,indent=0]
 ----
 include::src/main/resources/webroot/wiki.js[tags=init]
 ----
 
-Finally here is how we perform live rendering of Markdown text:
+最后这里是我们如何执行Markdown文本的实时渲染：
 
 [source,javascript,indent=0]
 ----
 include::src/main/resources/webroot/wiki.js[tags=live-rendering]
 ----
-<1> `$scope.$watch` allows being notified of state changes. Here we monitor changes on the `pageMarkdown` property that is bound to the editor `textarea`.
-<2> 300 milliseconds is a _fine_ delay to trigger rendering if nothing has changed in the editor.
-<3> Timeouts are promise, so if the state has changed we cancel the previous one and create a new one. This is how we delay rendering instead of doing it on every keystroke.
-<4> We ask the backend to render the editor text into some HTML, then refresh the preview.
+<1> `$scope.$watch` 允许通知状态更改。在这里，我们监视绑定到编辑器 `textarea` 的 `pageMarkdown` 属性的更改。
+<2> 如果编辑器中没有任何变化，300毫秒是触发渲染的适合延迟。
+<3> 超时是可靠的，所以如果状态发生了变化，我们会取消前一个并创建一个新状态。这是我们如何延迟渲染，而不是在每次击键时进行渲染。
+<4> 我们要求后端将编辑器文本呈现为HTML，然后刷新预览。
 
