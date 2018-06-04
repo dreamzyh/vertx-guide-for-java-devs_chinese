@@ -126,30 +126,27 @@ image::images/as-root.png[]
 
 image::images/as-baz.png[]
 
-To do that, we can access the `RoutingContext` user reference, and query for permissions.
-Here is how this is implemented for the `indexHandler` handler method:
+为此，我们可以访问 `RoutingContext` 用户参考，并查询权限。 这是如何实现 `indexHandler` 处理器方法的：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=indexHandler]
 ----
-<1> This is how a permission query is made. Note that this is an asynchronous operation.
-<2> We use the result to...
-<3> ...leverage it in the HTML template.
-<4> We also have access to the user login.
+<1> 这是如何进行权限查询。 请注意，这是一个异步操作。
+<2> 我们使用结果...
+<3> ...在HTML模板中利用它。
+<4> 我们也可以访问用户登录。
 
-The template code has been modified to only render certain fragments based on the value of `canCreatePage`:
+模板代码已被修改为仅基于 `canCreatePage` 的值呈现特定片段：
 
 [source,html]
 ----
 include::src/main/resources/templates/index.ftl[]
 ----
 
-The code is similar for ensuring that updating or deleting a page is restricted to certain roles and is available from the guide Git repository.
+该代码类似于确保仅限于某些角色更新或删除页面，并可从指南Git存储库中获得。
 
-It is important to ensure that checks are also being done on HTTP POST request handlers and not just when rendering HTML pages.
-Indeed, malicious attackers could still craft requests and perform actions while not being authenticated.
-Here is how to protect page deletions by wrapping the `pageDeletionHandler` code inside a topmost permission check:
+确保检查也是在HTTP POST请求处理器上完成，而不仅仅是在呈现HTML页面时进行。 事实上，恶意攻击者仍然可以制作请求并执行操作，而无需进行身份验证。 以下是如何通过将 `pageDeletionHandler` 代码封装在最上面的权限检查中来保护页面删除：
 
 [source,java,indent=0]
 ----
