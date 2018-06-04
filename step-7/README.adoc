@@ -54,26 +54,25 @@ Vert.x为执行身份验证和授权提供了广泛的选项。官方支持的�
 
 WARNING: 由于Apache Shiro的内部运作，Vert.x Shiro集成有一些问题。有些部分阻塞会影响性能，有些数据是使用线程本地状态存储的。您不应该尝试滥用暴露的内部状态API。
 
-=== Adding Apache Shiro authentication to routes
+=== 将Apache Shiro身份验证添加到路由
 
-The first step is to add the `vertx-auth-shiro` module to the Maven dependencies list:
+第一步是将 `vertx-auth-shiro` 模块添加到Maven依赖关系列表中：
 
 [source,xml,indent=0]
 ----
 include::pom.xml[tags=shiro]
 ----
 
-The properties file definition that we use is the following, located in `src/main/resources/wiki-users.properties`:
+我们使用的属性文件定义如下，位于 `src/main/resources/wiki-users.properties`:
 
 [source,index=0]
 ----
 include::src/main/resources/wiki-users.properties[tags=props]
 ----
 
-A `user`-prefixed entry is a user account, where the first value entry is the password possibly followed by roles.
-In this example user `bar` has password `baz`, is a `writer`, and a `writer` has `update` permission.
+以 `user` 为前缀的条目是用户帐户，其中第一个值条目是可能跟随角色的密码。 在这个例子中，用户 `bar` 有密码 `baz`，是一个 `编写` 角色 ，`编写` 角色有  `更新` 权限。
 
-Back to the `HttpServerVerticle` class code, we create an authentication provider using Apache Shiro:
+回到 `HttpServerVerticle` 类代码，我们使用Apache Shiro创建一个身份验证提供程序：
 
 [source,java,indent=0]
 ----
