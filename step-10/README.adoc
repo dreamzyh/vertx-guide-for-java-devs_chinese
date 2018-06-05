@@ -87,50 +87,44 @@ include::src/main/resources/webroot/wiki.js[tags=eventbus-markdown-sender]
 
 == 当页面被修改时警告用户
 
-在许多应用程序中， _最后一次提交胜利_ 原则是如何解决冲突：当两个用户同时编辑同一资源时，最后一个按下 _保存_ 按钮将覆盖以前的任何更改。In many applications, the _last commit wins_ principle is how conflicts are being resolved: when two users edit the same resource at the same time, the last one to press the _save_ button overwrites any previous changes.
+在许多应用程序中， _最后一次提交胜利_ 原则是如何解决冲突：当两个用户同时编辑同一资源时，最后一个按下 _保存_ 按钮将覆盖以前的任何更改。
 
-有关这个问题的方法有很多，比如实体版本化或关于分布式共识主题的大量文献。 尽管如此，让我们坚持一个简单的解决方案，看看我们如何通知用户何时做出改变，至少他（她）能够有机会处理这种情况。 只要内容在数据库中被更改，用户就可以决定采取何种最佳措施：覆盖或重新加载。There are ways around this issue, like entity versioning or extensive literature on the topic of distributed consensus.
-Nevertheless, let's stick to a simple solution and see how we can notify the user when a change has been made so that at the very least (s)he can get a chance to deal with the situation.
-As soon as the content has been changed in the database, the user can decide what is the best course of action to take: overwrite or reload.
+有关这个问题的方法有很多，比如实体版本化或关于分布式共识主题的大量文献。 尽管如此，让我们坚持一个简单的解决方案，看看我们如何通知用户何时做出改变，至少他（她）能够有机会处理这种情况。 只要内容在数据库中被更改，用户就可以决定采取何种最佳措施：覆盖或重新加载。
 
-To start with, we need to add an `alert alert-warning` message `div` in the page.
-But we want it to show-up only when the `pageModified` scope variable is set to `true`.
+首先，我们需要在页面中添加 `警告` 消息 `div` 。但是我们希望它只在 `pageModified` 范围变量设置为 `true` 时才显示。
 
 [source,html,indent=0]
 ----
 include::src/main/resources/webroot/index.html[tags=reload-warning]
 ----
 
-Now, `pageModified` must be set to `true` when this page is saved.
-Let's register an event bus handler for the `page.saved` address:
+现在，当页面被保存时， `pageModified` 必须设置为 `true` 。 让我们为 `page.saved` 地址注册一个事件总线处理器：
 
 [source,javascript,indent=0]
 ----
 include::src/main/resources/webroot/wiki.js[tags=register-page-saved-handler]
 ----
-<1> We do not want to print the warning if we modified the content ourselves so we need a client identifier.
-<2> The callback will be invoked when a message is received on the `page.saved` address.
-<3> Check that the body is not empty.
-<4> Make sure this event is related to the current wiki page.
-<5> Check that we are not the origin of the changes.
-<6> Since the event bus client is not managed by AngularJS, `$scope.$apply` wraps the callback to perform proper scope life cycle.
-<7> Set `pageModified` to true.
+<1> 如果我们自己修改了内容，我们不想打印警告，因此我们需要客户端标识符。
+<2> 当在 `page.saved` 地址上收到消息时，将调用回调。
+<3> 检查主体是否不空。
+<4> 确保这个事件与当前的wiki页面有关。
+<5> 检查我们是不是变化的源头。
+<6> 由于事件总线客户端不是由AngularJS管理的，因此 `$scope.$apply` 包装回调以执行适当的范围生命周期。
+<7> 将 `pageModified` 设置为true。
 
-Eventually we have to push messages when the content of a page is saved in the database:
+最终，当页面内容保存在数据库中时，我们必须推送消息：
 
 [source,java,indent=0]
 ----
 include::src/main/java/io/vertx/guides/wiki/http/HttpServerVerticle.java[tags=publish-on-page-updated]
 ----
-<1> `rxSavePage` returns a `Single<Void>` object.
-On success (i.e. no database failure) we publish an event.
-<2> The message contains the page identifier.
-<3> The message contains the client identifier.
-<4> The event is published on the `page.saved` address.
+<1> `rxSavePage` 返回一个 `Single<Void>` 对象。成功时(即没有数据库失败)，我们发布一个事件。
+<2> 该消息包含页面标识符。
+<3> 该消息包含客户端标识符。
+<4> 该事件发布在 `page.saved` 地址上。
 
-If we open the application in two tabs inside the same browser (or different browsers), select the same page on both, and update the content in one, the warning message is printed:
+如果我们在同一浏览器(或不同浏览器)内的两个选项卡中打开该应用程序，请选择两个页面上的同一页面，并将其中一个页面的内容更新，则将显示警告消息：
 
 image::images/edited-warning.png[]
 
-We could easily leverage the SockJS bridge for other purposes, like showing how many users are currently on a given page, supporting live comments in a chat box, etc.
-The key point is that both the server and the client sides share the same programming model by message passing over the event-bus.
+我们可以很容易地将SockJS桥用于其它用途，例如显示给定页面上有多少用户，在聊天框中支持实时评论等。关键在于通过传递事件总线上的消息，服务器端和客户端都可以共享相同的编程模型。
