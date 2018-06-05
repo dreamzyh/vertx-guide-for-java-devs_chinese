@@ -15,23 +15,13 @@
 * Vert.x RxJava支持来描述服务消费数据流， 
 * Vert.x断路器模块能够始终如一地处理服务的潜在故障。
 
-Access control, authentication and security are often neglected or come as an aftermath.
-We saw that Vert.x provides a simple pluggable authentication mechanism to leverage databases, files or LDAP directories.
-SSL network encryption is very easy to setup for a server, or for a client to use.
-Finally Vert.x supports JWT tokens, a very useful and decentralized authentication scheme for web APIs.
+访问控制，认证和安全性往往被忽视或产生不好的后果。我们看到Vert.x提供了一个简单的可插式的利用数据库，文件或LDAP目录的身份验证机制。 SSL网络加密非常容易在服务器上设置或客户端使用。最后，Vert.x支持JWT令牌，这是一种非常有用且分布式的Web API认证方案。
 
-The Vert.x core API relies on callbacks as it is the most generic way of processing asynchronous events.
-Vert.x provides a simple promise / future API.
-While Vert.x futures are composable, they shall be confined to limited usages such as dealing with verticle deployments and initialization.
-We saw how RxJava is supported in Vert.x, and we encourage you to use it for your own verticles.
-What's more RxJava is the most popular reactive programming library on the JVM, so you will easily find third-party libraries to integrate consistently in your end-to-end reactive applications.
+Vert.x核心API依赖于回调，因为它是处理异步事件的最通用的方式。 Vert.x提供了一个简单的异步API。虽然Vert.x的异步是可组合的，但它们应局限于有限的用途，例如处理verticle的部署和初始化。我们看到了Vert.x如何支持RxJava，我们鼓励您将它用于您自己的Verticle中。更重要的是，RxJava是JVM上最受欢迎的响应式编程库，因此您可以轻松找到第三方库，以便始终集成到您的端到端响应式应用程序中。
 
-Modern web applications tend to have the server expose _just_ HTTP/JSON APIs, and rely on client-side web frameworks for the user interface.
-We saw how to do that with AngularJS so as to turn our wiki into a single-page application.
+现代Web应用程序倾向于让服务器公开HTTP/JSON API，并依赖于用户界面的客户端Web框架。我们看到了如何使用AngularJS来实现这一点，从而将我们的wiki变成一个单页面的应用程序。
 
-Finally, we saw how elegant it was to extend the event bus of an application to allow web applications to send and receive events from the browser using the SockJS bridge.
-While it may initially seem like to be a small feature, in practice it turns out to greatly simplify the development of _real-time_ web application features.
-The SockJS bridge can actually be useful also in cases where one would have used an HTTP endpoint: sending a message then getting a response over the event bus can sometimes be simpler than doing an HTTP call, having the server process the HTTP request, forwarding it to a verticle on the event bus and eventually terminating the HTTP exchange by encoding a JSON response.
+最后，我们看到扩展应用程序的事件总线的优雅性，以允许Web应用程序使用SockJS桥接器从浏览器发送和接收事件。虽然它最初看起来可能是一个小功能，但实际上它大大简化了 _实时_ Web应用程序功能的开发。在使用HTTP端点的情况下，SockJS桥实际上也很有用：在事件总线上发送消息然后获得响应有时可能比做HTTP调用更简单，让服务器处理HTTP请求并转发它到事件总线上的Verticle，并最终通过编码JSON响应来终止HTTP交换。
 
 == Going further
 
