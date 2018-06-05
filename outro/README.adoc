@@ -1,23 +1,19 @@
-= Conclusion
+= 结尾
 
-This is the end of this guide.
-Let us take a moment to recapitulate the important takeaways from the previous sections, and then conclude by pointing to further useful resources.
+这是本指南的结尾。 让我们花点时间重述前几节中的重要内容，然后指出更多有用的资源。
 
-== Summary
+== 概要
 
-We started this guide by building a wiki web application with Vert.x.
-While the first iteration was typical of _"quick and dirty rapid prototyping"_ it showed that one could quickly and easily build such an application with server-side rendering of web templates and persistence with a relational database.
+我们通过使用Vert.x构建wiki Web应用程序来开始本指南。虽然第一次迭代是 _"敏捷和杂乱的快速原型"_ 的典型代表，但它表明，可以快速轻松地构建这样一个应用程序，使用Web模板的服务器端渲染以及关系数据库的持久性。
 
-The next steps showed how to improve the design through successive refactoring: first separating each technical concern as a standalone verticle, then extracting Vert.x services for API cleanliness and finally introducing JUnit tests for asynchronous code.
+接下来的步骤展示了如何通过连续的重构来改进设计：首先将每个技术关注点分离为独立的Verticle，然后提取Vert.x服务以获得简洁的API，最后介绍了对异步代码进行JUnit测试。
 
-We then ventured into consuming third-party HTTP/JSON services using the web client API that further simplifies the usage of the HTTP client from Vert.x core.
-Conversely, we also saw how to expose HTTP/JSON web APIs with the elegant Vert.x web module.
+然后，我们开始使用Web客户端API来调用第三方HTTP/JSON服务，这进一步简化了Vert.x核心中HTTP客户端的使用。相反，我们还看到了如何使用优雅的Vert.x Web模块发布HTTP/JSON Web API。
 
-From there it is very easy to extend the approach to build API gateways for providing facades to many services.
-If you were to build such gateways, we suggest that you take advantage of:
+从那里可以很容易地获得构建为许多服务提供对外接口的API网关的方法。如果你要建立这样的网关，我们建议你利用：
 
-* the Vert.x RxJava support to describe service consumption data flow streams, and
-* the Vert.x circuit-breaker module to deal consistently with the potential failure of services.
+* Vert.x RxJava支持来描述服务消费数据流， 
+* Vert.x断路器模块能够始终如一地处理服务的潜在故障。
 
 Access control, authentication and security are often neglected or come as an aftermath.
 We saw that Vert.x provides a simple pluggable authentication mechanism to leverage databases, files or LDAP directories.
