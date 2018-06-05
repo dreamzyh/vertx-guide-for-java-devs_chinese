@@ -1,18 +1,18 @@
-= A gentle guide to asynchronous programming with Eclipse Vert.x for Java developers
+= 用于Java开发人员的Eclipse Vert.x异步编程指南
 Julien Ponge <julien.ponge@insa-lyon.fr> ; Thomas Segismont <tsegismo@redhat.com> ; Julien Viet <jviet@redhat.com>
 v1.1.0, 2017-10-19
 :doctype: book
 
 :leveloffset: +1
 
-NOTE: You can read the latest published version of the guide at http://vertx.io/docs/guide-for-java-devs/
+NOTE: 您可以在 http://vertx.io/docs/guide-for-java-devs/ 上阅读最新发布的指南版本
 
 ifdef::rendered-pdf-link[]
 NOTE: This document is also link:{rendered-pdf-link}[available as a PDF].
 endif::[]
 
-.Acknowledgements
-This document has received contributions from Arnaud Esteve and Marc Paquette.
+=== 致谢
+本文收到了Arnaud Esteve和Marc Paquette的文稿。
 
 :imagesdir: intro
 include::intro/README.adoc[]
