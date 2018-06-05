@@ -23,34 +23,33 @@ Vert.x核心API依赖于回调，因为它是处理异步事件的最通用的�
 
 最后，我们看到扩展应用程序的事件总线的优雅性，以允许Web应用程序使用SockJS桥接器从浏览器发送和接收事件。虽然它最初看起来可能是一个小功能，但实际上它大大简化了 _实时_ Web应用程序功能的开发。在使用HTTP端点的情况下，SockJS桥实际上也很有用：在事件总线上发送消息然后获得响应有时可能比做HTTP调用更简单，让服务器处理HTTP请求并转发它到事件总线上的Verticle，并最终通过编码JSON响应来终止HTTP交换。
 
-== Going further
+== 进一步
 
-The http://vertx.io/[Vert.x website] is of course the authority on all things Vert.x.
+http://vertx.io/[Vert.x网站] 当然是所有有关Vert.x的权威。
 
-There are many features and modules that we haven't covered in this guide, such as:
+我们没有在本指南中介绍过许多功能和模块，例如：
 
-* clustering using Hazelcast, Infinispan, Apache Ignite or Apache Zookeeper,
-* how the code looks like with other supported languages,
-* exposing and consuming over HTTP/2, possibly (but not necessarily) with gRPC 
-* using NoSQL databases such as MongoDB or Redis,
-* sending emails over SMTP,
-* messaging with AMQP, Stomp, Kafka, MQTT or RabbitMQ,
-* using OAuth2 authentication from custom and popular providers,
-* Vert.x sync for writing blocking-style code that is later turned into _fibers_ non-blocking code at runtime,
-* publishing and discovering micro-services from registries, for instance when deploying on cloud environments like OpenShift,
-* exposing metrics and health checks.
+* 使用Hazelcast, Infinispan, Apache Ignite或Apache Zookeeper进行集群,
+* 代码如何与其他支持的语言一起使用，
+* 使用gRPC可能(但不一定)通过HTTP/2进行发布和调用
+* 使用MongoDB或Redis等NoSQL数据库，
+* 通过SMTP发送电子邮件，
+* 与AMQP，Stomp，Kafka，MQTT或RabbitMQ进行消息传递，
+* 使用来自定制和热门提供商的OAuth2身份验证，
+* 用于编写阻塞式代码的Vert.x同步，后者在运行时转换为多线程非阻塞代码，
+* 发布和发现注册管理机构的微服务，例如在OpenShift等云环境中进行部署时，
+* 暴露指标和健康检查。
 
-This list is not exhaustive: Vert.x is a toolkit so you are the one to decide what ingredients are required for your project, big or small.
+此列表并非详尽无遗：Vert.x是一个工具包，因此您可以决定项目所需的成分大小。
 
-You may also find it useful to browse the https://github.com/vert-x3/vertx-awesome[Vert.x awesome] curated list of community projects as it goes beyond what is being supported by the project.
+您也可能发现浏览 https://github.com/vert-x3/vertx-awesome[Vert.x awesome] 社区项目列表非常有用，因为它超出了项目支持的范围。
 
-If you are developing micro-services, we suggest reading the https://developers.redhat.com/promotions/building-reactive-microservices-in-java/["Building Reactive Microservices in Java" book by Clément Escoffier].
+如果您正在开发微服务，我们建议您阅读由ClémentEscoffier撰写的 https://developers.redhat.com/promotions/building-reactive-microservices-in-java/["Java中构建响应式微服务"] 一书。
 
-== That's all folks!
+== 这就是所有人!
 
-We hope that you enjoyed reading this guide, and that it turned out to be useful in your journey towards asynchronous programming with Vert.x.
+我们希望您喜欢阅读本指南，结果证明它对于您使用Vert.x进行异步编程的过程非常有用。
 
-Feel-free to get in touch with the authors, either directly by email or through https://groups.google.com/forum/?fromgroups#!forum/vertx/[the Vert.x project user group].
-Of course we appreciate praise, but we appreciate as much any constructive feedback that can improve this content.
+随时可以通过电子邮件或通过 https://groups.google.com/forum/?fromgroups#!forum/vertx/[Vert.x项目用户组] 与作者取得联系。 当然，我们赞赏表扬，但我们非常赞赏任何可以改进此内容的建设性反馈。
 
-Thank you very much!
+非常感谢!
